@@ -18,8 +18,8 @@
   },
   "homepage": "https://github.com/Hussein911911/Farhood-CV#readme",
   "dependencies": {
-    "@fontsource/changa": "^5.3.0",
-    "@fontsource/tajawal": "^5.3.0",
+    "@fontsource/amiri": "^5.3.0",
+    "@fontsource/cairo": "^5.3.0",
     "gsap": "^3.15.0"
   }
 }

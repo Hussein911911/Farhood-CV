@@ -1,52 +1,47 @@
 /* ===== الخطوط المحلية — تعمل بدون إنترنت ===== */
 
+/* أميري: خط نسخ أنيق للعناوين واللمسات الفخمة */
 @font-face {
-  font-family: 'Changa';
+  font-family: 'Amiri';
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url('../fonts/changa-arabic-400-normal.woff2') format('woff2');
+  src: url('../fonts/amiri-arabic-400-normal.woff2') format('woff2');
 }
 @font-face {
-  font-family: 'Changa';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url('../fonts/changa-arabic-600-normal.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'Changa';
+  font-family: 'Amiri';
   font-style: normal;
   font-weight: 700;
   font-display: swap;
-  src: url('../fonts/changa-arabic-700-normal.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'Changa';
-  font-style: normal;
-  font-weight: 800;
-  font-display: swap;
-  src: url('../fonts/changa-arabic-800-normal.woff2') format('woff2');
+  src: url('../fonts/amiri-arabic-700-normal.woff2') format('woff2');
 }
 
+/* القاهرة: خط عصري مرتب وواضح لكل النصوص والواجهة */
 @font-face {
-  font-family: 'Tajawal';
+  font-family: 'Cairo';
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url('../fonts/tajawal-arabic-400-normal.woff2') format('woff2');
+  src: url('../fonts/cairo-arabic-400-normal.woff2') format('woff2');
 }
 @font-face {
-  font-family: 'Tajawal';
+  font-family: 'Cairo';
   font-style: normal;
   font-weight: 500;
   font-display: swap;
-  src: url('../fonts/tajawal-arabic-500-normal.woff2') format('woff2');
+  src: url('../fonts/cairo-arabic-500-normal.woff2') format('woff2');
 }
 @font-face {
-  font-family: 'Tajawal';
+  font-family: 'Cairo';
   font-style: normal;
   font-weight: 700;
   font-display: swap;
-  src: url('../fonts/tajawal-arabic-700-normal.woff2') format('woff2');
+  src: url('../fonts/cairo-arabic-700-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Cairo';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url('../fonts/cairo-arabic-800-normal.woff2') format('woff2');
 }
