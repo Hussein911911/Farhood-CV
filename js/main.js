@@ -153,19 +153,35 @@
   playGateIntro();
 
   /* ============================================================
-     2) الستائر اللازوردية بين الأقسام
+     2) الستائر اللازوردية — IntersectionObserver موثوق على الموبايل
+        (لا يتأثر بالـpin أو شريط العنوان المتغير، والحركة تكتمل دائماً)
      ============================================================ */
-  gsap.utils.toArray('.curtain').forEach((curtain) => {
-    gsap.fromTo(curtain,
-      { yPercent: 101 },
-      {
-        yPercent: -101,
-        duration: 1.3,
-        ease: 'power4.inOut',
-        scrollTrigger: { trigger: curtain.parentElement, start: 'top 72%' },
-      }
-    );
-  });
+  if ('IntersectionObserver' in window) {
+    const curtainIO = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const curtain = entry.target;
+        curtainIO.unobserve(curtain);
+        gsap.fromTo(curtain,
+          { yPercent: 101 },
+          { yPercent: -101, duration: 1.3, ease: 'power4.inOut' }
+        );
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+    gsap.utils.toArray('.curtain').forEach((c) => curtainIO.observe(c));
+  } else {
+    gsap.utils.toArray('.curtain').forEach((curtain) => {
+      gsap.fromTo(curtain,
+        { yPercent: 101 },
+        {
+          yPercent: -101,
+          duration: 1.3,
+          ease: 'power4.inOut',
+          scrollTrigger: { trigger: curtain.parentElement, start: 'top 72%' },
+        }
+      );
+    });
+  }
 
   /* ============================================================
      3) انتقالات الظهور وعناوين الأقسام
@@ -177,7 +193,7 @@
         y: 0, opacity: 1,
         duration: 1.05,
         ease: 'power3.out',
-        scrollTrigger: { trigger: el, start: 'top 89%' },
+        scrollTrigger: { trigger: el, start: 'top 89%', once: true },
       }
     );
   });
@@ -188,7 +204,7 @@
       stagger: 0.09,
       duration: 0.95,
       ease: 'power4.out',
-      scrollTrigger: { trigger: title, start: 'top 87%' },
+      scrollTrigger: { trigger: title, start: 'top 87%', once: true },
     });
   });
 
@@ -197,7 +213,7 @@
       scaleX: 0,
       duration: 1.3,
       ease: 'power3.inOut',
-      scrollTrigger: { trigger: line, start: 'top 85%' },
+      scrollTrigger: { trigger: line, start: 'top 85%', once: true },
     });
   });
 
@@ -212,7 +228,7 @@
         opacity: 1,
         duration: 1.4,
         ease: 'power4.out',
-        scrollTrigger: { trigger: wrap, start: 'top 88%' },
+        scrollTrigger: { trigger: wrap, start: 'top 88%', once: true },
       }
     );
   });
@@ -547,11 +563,73 @@
   }
   initDust();
 
-  /* تحديث مواقع التمرير بعد تحميل الخطوط */
+  /* تحديث مواقع التمرير بعد تحميل الخطوط والصور */
   if (document.fonts && document.fonts.ready) {
     document.fonts.ready.then(() => ScrollTrigger.refresh());
   }
   window.addEventListener('load', () => ScrollTrigger.refresh());
+  document.querySelectorAll('img').forEach((img) =>
+    img.addEventListener('load', () => ScrollTrigger.refresh(), { once: true })
+  );
+
+  /* إعادة حساب عند تغيير حجم الشاشة (شريط عنوان كروم المتغير على الموبايل) */
+  let resizeTimer = 0;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => ScrollTrigger.refresh(), 250);
+  });
+
+  /* ============================================================
+     11) شبكة أمان: لا شيء يبقى مخفياً داخل الشاشة لأي سبب كان
+     ============================================================ */
+  function rescueHidden() {
+    const vh = window.innerHeight;
+    const inView = (el) => {
+      const r = el.getBoundingClientRect();
+      return r.top < vh * 0.95 && r.bottom > 0;
+    };
+
+    document.querySelectorAll('[data-reveal]').forEach((el) => {
+      if (el.dataset.rescued || !inView(el)) return;
+      el.dataset.rescued = '1';
+      gsap.to(el, { y: 0, opacity: 1, duration: 0.7, ease: 'power2.out' });
+    });
+
+    document.querySelectorAll('.section__title').forEach((t) => {
+      if (t.dataset.rescued || !inView(t)) return;
+      t.dataset.rescued = '1';
+      gsap.to(t.querySelectorAll('.word__inner'), {
+        yPercent: 0, duration: 0.7, stagger: 0.05, ease: 'power2.out',
+      });
+    });
+
+    document.querySelectorAll('[data-img-reveal]').forEach((w) => {
+      if (w.dataset.rescued || !inView(w)) return;
+      w.dataset.rescued = '1';
+      gsap.to(w, {
+        clipPath: 'inset(0% 0% 0% 0%)', opacity: 1,
+        duration: 0.9, ease: 'power2.out',
+      });
+    });
+  }
+  let rescueTicking = false;
+  function onRescueScroll() {
+    if (rescueTicking) return;
+    rescueTicking = true;
+    requestAnimationFrame(() => { rescueHidden(); rescueTicking = false; });
+  }
+  window.addEventListener('scroll', onRescueScroll, { passive: true });
+  window.addEventListener('resize', rescueHidden);
+  setTimeout(rescueHidden, 3500);
+  window.addEventListener('load', rescueHidden);
+
+  /* إزالة قسرية للبوابة الافتتاحية تحت أي ظرف (لا تعلق الموقع أبداً) */
+  setTimeout(() => {
+    if (gateIntro && document.body.contains(gateIntro)) {
+      document.body.style.overflow = '';
+      gateIntro.remove();
+    }
+  }, 9000);
 
   /* شبكة أمان: أي فشل غير متوقع لا يخفي المحتوى */
   setTimeout(() => {
