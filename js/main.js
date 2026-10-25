@@ -30,6 +30,36 @@
   }
   document.querySelectorAll('[data-split]').forEach(splitWords);
 
+  /* ---------- نافذة عرض الشهادة (تعمل بدون GSAP أيضاً) ---------- */
+  (function initLightbox() {
+    const openBtn = document.getElementById('openCert');
+    const box = document.getElementById('certLightbox');
+    if (!openBtn || !box) return;
+    const closeEls = box.querySelectorAll('[data-close]');
+    let lastFocus = null;
+
+    function open() {
+      lastFocus = document.activeElement;
+      box.classList.add('is-open');
+      box.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      const closeBtn = box.querySelector('.lightbox__close');
+      closeBtn && closeBtn.focus();
+    }
+    function close() {
+      box.classList.remove('is-open');
+      box.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+      lastFocus && lastFocus.focus && lastFocus.focus();
+    }
+
+    openBtn.addEventListener('click', open);
+    closeEls.forEach((el) => el.addEventListener('click', close));
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && box.classList.contains('is-open')) close();
+    });
+  })();
+
   /* ---------- تفاعلات أساسية تعمل بدون أنيميشن ---------- */
   function initBasicInteractions() {
     const toTopBtn = document.getElementById('toTop');
