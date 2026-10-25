@@ -1,6 +1,6 @@
 /* ============================================================
-   حسين عباس فرهود — محرك الحركات والتفاعل
-   GSAP + ScrollTrigger + Canvas DNA + Custom Cursor
+   حسين عباس فرهود — محرك الحركات البابلي
+   GSAP + ScrollTrigger + Canvas Dust + Pinned Gallery
    ============================================================ */
 
 (function () {
@@ -13,7 +13,7 @@
   const toArabicDigits = (n) =>
     String(n).replace(/\d/g, (d) => '٠١٢٣٤٥٦٧٨٩'[Number(d)]);
 
-  /* ---------- تقسيم الكلمات (آمن للعربية: على مستوى الكلمة لا الحرف) ---------- */
+  /* ---------- تقسيم الكلمات (آمن للعربية) ---------- */
   function splitWords(el) {
     const words = el.textContent.trim().split(/\s+/);
     el.textContent = '';
@@ -70,7 +70,7 @@
     });
   }
 
-  /* ---------- حالة عدم وجود GSAP أو تقليل الحركة ---------- */
+  /* ---------- وضع تقليل الحركة أو غياب GSAP ---------- */
   if (REDUCED || !window.gsap) {
     document.body.classList.add('no-anim');
     if (preloader) preloader.remove();
@@ -88,34 +88,30 @@
   gsap.set('.word__inner', { yPercent: 110 });
 
   /* ============================================================
-     1) شاشة التحميل ثم دخول الهيرو
+     1) شاشة التحميل: انفتاح بوابتَي عشتار ثم دخول الهيرو
      ============================================================ */
   function heroIntro() {
     const tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
-    tl.fromTo('#scene', { opacity: 0 }, { opacity: 0.9, duration: 1.4 }, 0)
-      .to('.hero__eyebrow', { y: 0, opacity: 1, duration: 0.9 }, 0.15)
-      .to('.hero__title .word__inner', {
-        yPercent: 0,
-        duration: 1.1,
-        stagger: 0.12,
-      }, 0.28)
-      .to('.hero__subtitle', { y: 0, opacity: 1, duration: 0.9 }, 0.62)
-      .to('.hero__cta', { y: 0, opacity: 1, duration: 0.9 }, 0.76)
-      .to('.hero__meta', { y: 0, opacity: 1, duration: 0.9 }, 0.9)
-      .fromTo('.hero__scroll', { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.8 }, 1.1);
+    tl.to('.hero__eyebrow', { y: 0, opacity: 1, duration: 0.9 }, 0.1)
+      .to('.hero__title .word__inner', { yPercent: 0, duration: 1.15, stagger: 0.13 }, 0.22)
+      .to('.hero__role', { y: 0, opacity: 1, duration: 0.85 }, 0.55)
+      .to('.hero__subtitle', { y: 0, opacity: 1, duration: 0.9 }, 0.68)
+      .to('.hero__cta', { y: 0, opacity: 1, duration: 0.9 }, 0.82)
+      .to('.hero__meta', { y: 0, opacity: 1, duration: 0.9 }, 0.96)
+      .fromTo('.hero__scroll', { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.8 }, 1.15);
   }
 
-  gsap.set('[data-hero]:not([data-split])', { y: 34, opacity: 0 });
+  gsap.set('[data-hero]:not([data-split])', { y: 36, opacity: 0 });
   gsap.set('.hero__scroll', { opacity: 0 });
 
-  if (!REDUCED && preloader) {
+  if (preloader) {
     const countEl = document.getElementById('preloaderCount');
     const barEl = document.getElementById('preloaderBar');
     const counter = { v: 0 };
 
     gsap.to(counter, {
       v: 100,
-      duration: 1.9,
+      duration: 2,
       ease: 'power2.inOut',
       onUpdate() {
         const val = Math.round(counter.v);
@@ -124,15 +120,11 @@
       },
       onComplete() {
         gsap.timeline()
-          .to('.preloader__inner', { y: -34, opacity: 0, duration: 0.5, ease: 'power2.in' })
-          .to('.preloader__panel', {
-            yPercent: -100,
-            stagger: 0.13,
-            duration: 0.95,
-            ease: 'power4.inOut',
-          }, '-=0.15')
+          .to('.preloader__inner', { y: -30, opacity: 0, duration: 0.45, ease: 'power2.in' })
+          .to('.gate--start', { xPercent: 102, duration: 1.15, ease: 'power4.inOut' }, '-=0.1')
+          .to('.gate--end', { xPercent: -102, duration: 1.15, ease: 'power4.inOut' }, '<')
           .set(preloader, { display: 'none' })
-          .add(heroIntro, '-=0.6');
+          .add(heroIntro, '-=0.75');
       },
     });
   } else {
@@ -140,14 +132,28 @@
   }
 
   /* ============================================================
-     2) انتقالات الظهور عند التمرير
+     2) الستائر اللازوردية بين الأقسام
+     ============================================================ */
+  gsap.utils.toArray('.curtain').forEach((curtain) => {
+    gsap.fromTo(curtain,
+      { yPercent: 101 },
+      {
+        yPercent: -101,
+        duration: 1.3,
+        ease: 'power4.inOut',
+        scrollTrigger: { trigger: curtain.parentElement, start: 'top 72%' },
+      }
+    );
+  });
+
+  /* ============================================================
+     3) انتقالات الظهور وعناوين الأقسام
      ============================================================ */
   gsap.utils.toArray('[data-reveal]').forEach((el) => {
     gsap.fromTo(el,
       { y: 48, opacity: 0 },
       {
-        y: 0,
-        opacity: 1,
+        y: 0, opacity: 1,
         duration: 1.05,
         ease: 'power3.out',
         scrollTrigger: { trigger: el, start: 'top 89%' },
@@ -155,7 +161,6 @@
     );
   });
 
-  /* عناوين الأقسام: كلمات تصعد من أقنعة */
   gsap.utils.toArray('.section__title').forEach((title) => {
     gsap.to(title.querySelectorAll('.word__inner'), {
       yPercent: 0,
@@ -166,7 +171,6 @@
     });
   });
 
-  /* خط زخرفة العنوان */
   gsap.utils.toArray('.section__line').forEach((line) => {
     gsap.from(line, {
       scaleX: 0,
@@ -176,7 +180,71 @@
     });
   });
 
-  /* العدادات */
+  /* ============================================================
+     4) كشف الصور السينمائي + Parallax
+     ============================================================ */
+  gsap.utils.toArray('[data-img-reveal]').forEach((wrap) => {
+    gsap.fromTo(wrap,
+      { clipPath: 'inset(12% 7% 12% 7%)', opacity: 0.4 },
+      {
+        clipPath: 'inset(0% 0% 0% 0%)',
+        opacity: 1,
+        duration: 1.4,
+        ease: 'power4.out',
+        scrollTrigger: { trigger: wrap, start: 'top 88%' },
+      }
+    );
+  });
+
+  gsap.utils.toArray('[data-parallax-img]').forEach((img) => {
+    gsap.fromTo(img,
+      { '--py': '-28px' },
+      {
+        '--py': '28px',
+        ease: 'none',
+        scrollTrigger: {
+          trigger: img.closest('[data-img-reveal]') || img.parentElement,
+          start: 'top bottom',
+          end: 'bottom top',
+          scrub: 1.2,
+        },
+      }
+    );
+  });
+
+  /* ============================================================
+     5) معرض بابل — تمرير أفلي مثبّت
+     ============================================================ */
+  const gallery = document.getElementById('gallery');
+  const track = document.getElementById('galleryTrack');
+  const viewport = document.getElementById('galleryViewport');
+  const galleryProgress = document.getElementById('galleryProgress');
+
+  if (gallery && track) {
+    const getDistance = () => Math.max(0, track.scrollWidth - window.innerWidth);
+
+    gsap.to(track, {
+      x: () => -getDistance(),
+      ease: 'none',
+      scrollTrigger: {
+        trigger: gallery,
+        start: 'top top',
+        end: () => '+=' + getDistance(),
+        pin: true,
+        scrub: 1,
+        invalidateOnRefresh: true,
+        anticipatePin: 1,
+        onUpdate(self) {
+          if (galleryProgress) galleryProgress.style.width = self.progress * 100 + '%';
+        },
+      },
+    });
+    viewport.classList.add('is-pinned');
+  }
+
+  /* ============================================================
+     6) العدادات والخط الزمني والأشرطة والتقدم
+     ============================================================ */
   document.querySelectorAll('[data-count]').forEach((el) => {
     const end = Number(el.dataset.count);
     ScrollTrigger.create({
@@ -197,7 +265,6 @@
     });
   });
 
-  /* الخط الزمني يمتلئ مع التمرير */
   gsap.to('#timelineLine', {
     scaleY: 1,
     ease: 'none',
@@ -209,7 +276,6 @@
     },
   });
 
-  /* أشرطة اللغات */
   document.querySelectorAll('.lang__fill').forEach((fill) => {
     const w = fill.dataset.width;
     fill.style.setProperty('--w', w + '%');
@@ -221,14 +287,13 @@
     });
   });
 
-  /* شريط تقدم القراءة */
   gsap.to('#scrollProgress', {
     scaleX: 1,
     ease: 'none',
     scrollTrigger: { start: 0, end: 'max', scrub: 0.3 },
   });
 
-  /* حركة Parallax للكرات الضوئية */
+  /* كرات الضوء */
   gsap.utils.toArray('[data-parallax]').forEach((el) => {
     const speed = parseFloat(el.dataset.parallax) * 120;
     gsap.fromTo(el,
@@ -247,7 +312,7 @@
   });
 
   /* ============================================================
-     3) القائمة العلوية وزر العودة
+     7) القائمة العلوية وزر العودة وقائمة الجوال
      ============================================================ */
   const nav = document.getElementById('nav');
   const toTop = document.getElementById('toTop');
@@ -260,11 +325,8 @@
   window.addEventListener('scroll', onScroll, { passive: true });
   onScroll();
 
-  toTop.addEventListener('click', () =>
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  );
+  toTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 
-  /* قائمة الجوال */
   const navToggle = document.getElementById('navToggle');
   const mobileMenu = document.getElementById('mobileMenu');
   navToggle.addEventListener('click', () => {
@@ -280,7 +342,7 @@
   );
 
   /* ============================================================
-     4) المؤشر المخصص + الأزرار المغناطيسية + الإمالة
+     8) المؤشر المخصص + المغناطيس + الإمالة
      ============================================================ */
   if (FINE) {
     const cursor = document.getElementById('cursor');
@@ -288,8 +350,7 @@
     const ring = cursor.querySelector('.cursor__ring');
     gsap.set([dot, ring], { xPercent: -50, yPercent: -50, x: innerWidth / 2, y: innerHeight / 2 });
 
-    let mx = innerWidth / 2, my = innerHeight / 2;
-    let rx = mx, ry = my;
+    let mx = innerWidth / 2, my = innerHeight / 2, rx = mx, ry = my;
 
     window.addEventListener('mousemove', (e) => {
       mx = e.clientX;
@@ -308,7 +369,6 @@
       el.addEventListener('mouseleave', () => ring.classList.remove('is-hover'));
     });
 
-    /* الأزرار المغناطيسية */
     document.querySelectorAll('.magnetic').forEach((el) => {
       el.addEventListener('mousemove', (e) => {
         const r = el.getBoundingClientRect();
@@ -321,7 +381,6 @@
       );
     });
 
-    /* إمالة البطاقات + بقعة الضوء */
     document.querySelectorAll('.tilt-card').forEach((card) => {
       card.addEventListener('mousemove', (e) => {
         const r = card.getBoundingClientRect();
@@ -330,8 +389,8 @@
         card.style.setProperty('--mx', px * 100 + '%');
         card.style.setProperty('--my', py * 100 + '%');
         gsap.to(card, {
-          rotateY: (px - 0.5) * 7,
-          rotateX: (0.5 - py) * 7,
+          rotateY: (px - 0.5) * 6,
+          rotateX: (0.5 - py) * 6,
           duration: 0.5,
           transformPerspective: 900,
           ease: 'power2.out',
@@ -344,7 +403,7 @@
   }
 
   /* ============================================================
-     5) نسخ رقم الهاتف
+     9) نسخ رقم الهاتف
      ============================================================ */
   const copyBtn = document.getElementById('copyPhone');
   const copyLabel = document.getElementById('copyPhoneLabel');
@@ -366,23 +425,14 @@
   });
 
   /* ============================================================
-     6) مشهد الحمض النووي DNA على Canvas
+     10) غبار بابل الذهبي على Canvas
      ============================================================ */
-  function initScene() {
-    const canvas = document.getElementById('scene');
+  function initDust() {
+    const canvas = document.getElementById('dust');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     let w = 0, h = 0, raf = 0;
-    const mouse = { x: 0, y: 0, tx: 0, ty: 0 };
-    const N = 24;
-
-    const stars = Array.from({ length: 70 }, () => ({
-      x: Math.random(),
-      y: Math.random(),
-      r: Math.random() * 1.3 + 0.3,
-      tw: Math.random() * Math.PI * 2,
-      sp: 0.4 + Math.random() * 0.9,
-    }));
+    let particles = [];
 
     function resize() {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -391,105 +441,58 @@
       canvas.width = w * dpr;
       canvas.height = h * dpr;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    }
-    resize();
-    window.addEventListener('resize', resize);
-
-    if (FINE) {
-      window.addEventListener('mousemove', (e) => {
-        mouse.tx = e.clientX / innerWidth - 0.5;
-        mouse.ty = e.clientY / innerHeight - 0.5;
-      }, { passive: true });
+      seed();
     }
 
-    function drawStrand(pts, rgb) {
-      ctx.beginPath();
-      pts.forEach((p, i) => (i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y)));
-      ctx.strokeStyle = `rgba(${rgb},0.22)`;
-      ctx.lineWidth = 1.4;
-      ctx.stroke();
+    function seed() {
+      const count = Math.min(80, Math.floor((w * h) / 16000));
+      particles = Array.from({ length: count }, () => ({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        r: Math.random() * 2.2 + 0.6,
+        vy: -(Math.random() * 0.35 + 0.12),
+        sway: Math.random() * Math.PI * 2,
+        swaySp: Math.random() * 0.015 + 0.005,
+        gold: Math.random() > 0.35,
+        alpha: Math.random() * 0.5 + 0.2,
+      }));
+    }
 
-      pts.slice().sort((a, b) => a.depth - b.depth).forEach((p) => {
-        const r = 2.1 + p.depth * 4.1;
-        const glow = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r * 2.6);
-        glow.addColorStop(0, `rgba(${rgb},${0.3 + p.depth * 0.55})`);
-        glow.addColorStop(1, `rgba(${rgb},0)`);
+    function frame() {
+      ctx.clearRect(0, 0, w, h);
+      for (const p of particles) {
+        p.y += p.vy;
+        p.sway += p.swaySp;
+        p.x += Math.sin(p.sway) * 0.25;
+        if (p.y < -10) { p.y = h + 10; p.x = Math.random() * w; }
+
+        const color = p.gold ? '216,181,106' : '125,180,238';
+        const glow = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 4);
+        glow.addColorStop(0, `rgba(${color},${p.alpha})`);
+        glow.addColorStop(1, `rgba(${color},0)`);
         ctx.fillStyle = glow;
         ctx.beginPath();
-        ctx.arc(p.x, p.y, r * 2.6, 0, Math.PI * 2);
+        ctx.arc(p.x, p.y, p.r * 4, 0, Math.PI * 2);
         ctx.fill();
 
-        ctx.fillStyle = `rgba(${rgb},${0.45 + p.depth * 0.5})`;
+        ctx.fillStyle = `rgba(${color},${Math.min(1, p.alpha + 0.35)})`;
         ctx.beginPath();
-        ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
-        ctx.fill();
-      });
-    }
-
-    function frame(t) {
-      mouse.x += (mouse.tx - mouse.x) * 0.05;
-      mouse.y += (mouse.ty - mouse.y) * 0.05;
-      ctx.clearRect(0, 0, w, h);
-
-      /* النجوم */
-      for (const s of stars) {
-        const alpha = 0.18 + 0.32 * (0.5 + 0.5 * Math.sin(t * 0.001 * s.sp + s.tw));
-        ctx.fillStyle = `rgba(243,226,179,${alpha})`;
-        ctx.beginPath();
-        ctx.arc(s.x * w, s.y * h, s.r, 0, Math.PI * 2);
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
         ctx.fill();
       }
-
-      /* الحلزون المزدوج */
-      const cx = w / 2 + mouse.x * 60;
-      const cy = h / 2 + mouse.y * 28;
-      const R = Math.min(w * 0.24, 150);
-      const gap = Math.min(33, h * 0.58 / N);
-      const startY = cy - (gap * (N - 1)) / 2;
-      const rot = t * 0.0007;
-      const A = [], B = [];
-
-      for (let i = 0; i < N; i++) {
-        const ang = i * 0.42 + rot;
-        const zA = Math.sin(ang);
-        const zB = Math.sin(ang + Math.PI);
-        A.push({ x: cx + Math.cos(ang) * R, y: startY + i * gap, depth: (zA + 1) / 2 });
-        B.push({ x: cx + Math.cos(ang + Math.PI) * R, y: startY + i * gap, depth: (zB + 1) / 2 });
-      }
-
-      /* الروابط العرضية */
-      for (let i = 0; i < N; i++) {
-        const alpha = 0.07 + 0.13 * Math.abs(A[i].depth - 0.5) * 2;
-        ctx.strokeStyle = `rgba(154,163,178,${alpha})`;
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(A[i].x, A[i].y);
-        ctx.lineTo(B[i].x, B[i].y);
-        ctx.stroke();
-      }
-
-      drawStrand(A, '216,181,106');   /* ذهبي */
-      drawStrand(B, '65,217,155');    /* أخضر حيوي */
-
       raf = requestAnimationFrame(frame);
     }
 
-    if (REDUCED) {
-      frame(0);
-      cancelAnimationFrame(raf);
-    } else {
-      raf = requestAnimationFrame(frame);
-    }
+    resize();
+    window.addEventListener('resize', resize);
+    raf = requestAnimationFrame(frame);
 
     document.addEventListener('visibilitychange', () => {
-      if (document.hidden) {
-        cancelAnimationFrame(raf);
-      } else if (!REDUCED) {
-        raf = requestAnimationFrame(frame);
-      }
+      if (document.hidden) cancelAnimationFrame(raf);
+      else raf = requestAnimationFrame(frame);
     });
   }
-  initScene();
+  initDust();
 
   /* تحديث مواقع التمرير بعد تحميل الخطوط */
   if (document.fonts && document.fonts.ready) {
@@ -497,7 +500,7 @@
   }
   window.addEventListener('load', () => ScrollTrigger.refresh());
 
-  /* شبكة أمان: أي فشل غير متوقع لا يخفي المحتوى */
+  /* شبكة أمان */
   setTimeout(() => {
     if (!window.__animReady) {
       document.body.classList.add('no-anim');
