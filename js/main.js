@@ -32,9 +32,9 @@
 
   /* ---------- نافذة عرض الشهادة (تعمل بدون GSAP أيضاً) ---------- */
   (function initLightbox() {
-    const openBtn = document.getElementById('openCert');
+    const openBtns = document.querySelectorAll('[data-open-cert]');
     const box = document.getElementById('certLightbox');
-    if (!openBtn || !box) return;
+    if (!openBtns.length || !box) return;
     const closeEls = box.querySelectorAll('[data-close]');
     let lastFocus = null;
 
@@ -53,7 +53,7 @@
       lastFocus && lastFocus.focus && lastFocus.focus();
     }
 
-    openBtn.addEventListener('click', open);
+    openBtns.forEach((btn) => btn.addEventListener('click', open));
     closeEls.forEach((el) => el.addEventListener('click', close));
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && box.classList.contains('is-open')) close();
