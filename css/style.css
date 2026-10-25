@@ -168,11 +168,9 @@ section { scroll-margin-top: 90px; position: relative; }
 
 /* ============ البطاقات الزجاجية ============ */
 .glass {
-  background: linear-gradient(155deg, rgba(27, 52, 86, 0.55), rgba(11, 22, 38, 0.65));
+  background: linear-gradient(155deg, rgba(30, 56, 92, 0.92), rgba(11, 22, 38, 0.95));
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
   position: relative;
   transition: border-color 0.5s var(--ease-out), box-shadow 0.5s var(--ease-out);
 }
@@ -197,105 +195,164 @@ section { scroll-margin-top: 90px; position: relative; }
 }
 .glass:hover::before { opacity: 1; }
 
-/* ============ شاشة التحميل: بوابتان ============ */
-.preloader {
+/* ============ بوابة عشتار الافتتاحية ============ */
+.gate-intro {
   position: fixed;
   inset: 0;
   z-index: 300;
+  perspective: 1500px;
+  background: #050a13;
   overflow: hidden;
-  background: transparent;
 }
-.gate {
+.gate-intro.is-open { pointer-events: none; }
+
+/* الضوء المتسرب من خلف الباب */
+.gate-light {
   position: absolute;
-  top: 0; bottom: 0;
-  width: 50.5%;
+  inset: 0;
   background:
-    linear-gradient(180deg, rgba(216, 181, 106, 0.08), transparent 30%),
-    linear-gradient(135deg, #10345c, #0a1f3a 55%, #081628);
+    radial-gradient(ellipse 18% 70% at 50% 55%, rgba(243, 226, 179, 0.85), rgba(216, 181, 106, 0.35) 45%, transparent 72%);
+  opacity: 0;
+  transform: scaleX(0.4);
+  z-index: 1;
 }
-.gate--start {
+
+.gate-door {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50.5%;
+  z-index: 2;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+.gate-door--start {
   inset-inline-start: 0;
-  border-inline-end: 1px solid rgba(216, 181, 106, 0.4);
+  transform-origin: right center;
 }
-.gate--end {
+.gate-door--end {
   inset-inline-end: 0;
-  border-inline-start: 1px solid rgba(216, 181, 106, 0.4);
+  transform-origin: left center;
 }
-.gate::before {
+.gate-door__face {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(216, 181, 106, 0.14), transparent 22%),
+    linear-gradient(160deg, #16457a 0%, #0d2a4d 48%, #081a31 100%);
+  box-shadow: inset 0 0 90px rgba(0, 0, 0, 0.55);
+}
+/* طابوق البوابة المزجّج */
+.gate-door__face::before {
   content: '';
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(rgba(125, 180, 238, 0.12) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(125, 180, 238, 0.12) 1px, transparent 1px);
+    linear-gradient(rgba(125, 180, 238, 0.16) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(125, 180, 238, 0.16) 1px, transparent 1px);
   background-size: 56px 26px, 56px 26px;
   background-position: 0 0, 28px 13px;
 }
-.gate::after {
-  content: '';
+/* حافة القوس الداخلية المذهّبة */
+.gate-door__arch {
   position: absolute;
   top: 50%;
-  width: 150px; height: 270px;
+  width: 170px;
+  height: 320px;
   transform: translateY(-50%);
-  border: 2px solid rgba(216, 181, 106, 0.35);
-  border-radius: 80px 80px 12px 12px;
+  border: 3px solid rgba(216, 181, 106, 0.55);
+  border-radius: 90px 90px 14px 14px;
+  box-shadow: 0 0 26px rgba(216, 181, 106, 0.25), inset 0 0 26px rgba(216, 181, 106, 0.18);
 }
-.gate--start::after { inset-inline-end: -75px; }
-.gate--end::after { inset-inline-start: -75px; }
+.gate-door--start .gate-door__arch { inset-inline-end: -88px; }
+.gate-door--end .gate-door__arch { inset-inline-start: -88px; }
 
-.preloader__inner {
-  position: relative;
-  z-index: 2;
-  height: 100%;
+/* سماكة الباب تظهر أثناء الفتح */
+.gate-door__edge {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 10px;
+  background: linear-gradient(90deg, #6b5326, #d8b56a 45%, #4a3a1a);
+  box-shadow: 0 0 18px rgba(0, 0, 0, 0.6);
+  opacity: 0;
+}
+.gate-door--start .gate-door__edge { inset-inline-end: 0; }
+.gate-door--end .gate-door__edge { inset-inline-start: 0; }
+
+.gate-door__lintel {
+  position: absolute;
+  top: 9%;
+  inset-inline: 12%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 12px 18px;
+  color: var(--gold-2);
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: 1px;
+  border-block: 1px solid rgba(216, 181, 106, 0.45);
+  background: linear-gradient(90deg, transparent, rgba(216, 181, 106, 0.1), transparent);
+}
+.gate-door__lintel svg { color: var(--gold); flex-shrink: 0; }
+
+.gate-door__relief {
+  position: absolute;
+  bottom: 12%;
+  inset-inline: 0;
+  display: grid;
+  place-items: center;
+  color: rgba(216, 181, 106, 0.75);
+  filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.5));
+}
+
+/* النص المركزي فوق خط التقاء البابين */
+.gate-intro__center {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 14px;
+  gap: 10px;
   text-align: center;
+  padding: 0 24px;
 }
-.preloader__mark { color: var(--gold); animation: pulse-mark 1.6s ease-in-out infinite; }
+.gate-intro__star {
+  color: var(--gold);
+  margin-bottom: 8px;
+  animation: pulse-mark 1.8s ease-in-out infinite;
+}
 @keyframes pulse-mark {
   0%, 100% { transform: scale(1); opacity: 0.75; }
   50% { transform: scale(1.12); opacity: 1; }
 }
-.preloader__count {
+.gate-intro__name {
   font-family: var(--font-head);
   font-weight: 800;
-  font-size: clamp(3.4rem, 10vw, 6rem);
-  line-height: 1;
-  background: linear-gradient(160deg, var(--gold-2), var(--gold), var(--gold-deep));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  display: flex;
-  align-items: flex-start;
-  gap: 4px;
+  font-size: clamp(1.8rem, 6vw, 3.2rem);
+  color: var(--gold-2);
+  text-shadow: 0 6px 30px rgba(0, 0, 0, 0.7);
+  white-space: nowrap;
 }
-.preloader__count small { font-size: 1.4rem; color: var(--gold); -webkit-text-fill-color: var(--gold); margin-top: 10px; }
-.preloader__name {
+.gate-intro__role {
   font-family: var(--font-head);
-  font-weight: 600;
-  letter-spacing: 1px;
+  font-weight: 500;
   color: var(--lapis-bright);
+  letter-spacing: 2px;
+  font-size: clamp(0.9rem, 2.6vw, 1.1rem);
 }
-.preloader__hint { color: var(--muted); font-size: 0.88rem; }
-.preloader__bar {
-  width: min(280px, 70vw);
-  height: 2px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 2px;
-  overflow: hidden;
-  margin-top: 8px;
+@media (max-width: 620px) {
+  .gate-door__arch { width: 110px; height: 230px; }
+  .gate-door--start .gate-door__arch { inset-inline-end: -58px; }
+  .gate-door--end .gate-door__arch { inset-inline-start: -58px; }
+  .gate-door__lintel { font-size: 0.9rem; inset-inline: 8%; }
 }
-.preloader__bar span {
-  display: block;
-  height: 100%;
-  width: 0%;
-  background: linear-gradient(90deg, var(--lapis), var(--gold-2));
-  box-shadow: 0 0 14px var(--gold);
-}
-.preloader.is-done { pointer-events: none; }
 
 /* ============ المؤشر المخصص ============ */
 .cursor { position: fixed; inset: 0; z-index: 250; pointer-events: none; }
@@ -412,8 +469,7 @@ body.menu-open .nav__toggle span:last-child { transform: translateY(-4px) rotate
   position: fixed;
   inset: 0;
   z-index: 140;
-  background: rgba(7, 13, 24, 0.97);
-  backdrop-filter: blur(24px);
+  background: rgba(6, 11, 21, 0.99);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -725,19 +781,16 @@ body.menu-open .mobile-menu__links a:nth-child(6) { transition-delay: 0.4s; }
   height: 100%;
   object-fit: cover;
 }
-/* صور parallax: متغير --py يحرّكه GSAP، والـscale خاصية مستقلة */
+/* صور parallax: GSAP يحرك transform مباشرة، والـscale خاصية مستقلة عنه */
 [data-parallax-img] {
-  scale: 1.08;
-  transform: translateY(var(--py, 0px));
+  scale: 1.09;
   will-change: transform;
 }
 .gcard__media img {
-  transform: translateY(var(--py, 0px)) scale(1);
-  transition: transform 0.9s var(--ease-out);
+  scale: 1.02;
+  transition: scale 0.9s var(--ease-out);
 }
-.gcard:hover .gcard__media img {
-  transform: translateY(var(--py, 0px)) scale(1.07);
-}
+.gcard:hover .gcard__media img { scale: 1.09; }
 /* زوايا مزخرفة */
 .frame::after, .gcard__media::after {
   content: '';
@@ -1248,6 +1301,16 @@ a.contact__card:hover { transform: translateY(-6px); }
 .no-anim .lang__fill { width: var(--w, 0) !important; }
 .no-anim .curtain { display: none; }
 .no-anim [data-img-reveal] { clip-path: none !important; }
+.no-anim .gate-intro { display: none !important; }
+
+/* الموبايل: إطفاء الـblur المكلف نهائياً لسلاسة التمرير */
+@media (pointer: coarse) {
+  .nav, .mobile-menu, .hero__eyebrow, .btn--ghost, .gcard__num, .glass {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+  .bg-noise { opacity: 0.25; }
+}
 
 /* ============ استجابة الجوال ============ */
 @media (max-width: 960px) {
@@ -1298,4 +1361,5 @@ a.contact__card:hover { transform: translateY(-6px); }
   }
   .marquee__track { animation: none; }
   .hero__bg img { animation: none; transform: none; }
+  .gate-intro { display: none !important; }
 }
