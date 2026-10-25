@@ -1,6 +1,6 @@
 /* ============================================================
    حسين عباس فرهود — محرك الحركات البابلي
-   GSAP + ScrollTrigger + Canvas Dust + Pinned Gallery
+   GSAP + ScrollTrigger + Canvas Dust (sprite-optimized)
    ============================================================ */
 
 (function () {
@@ -8,7 +8,7 @@
 
   const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const FINE = window.matchMedia('(pointer: fine)').matches;
-  const preloader = document.getElementById('preloader');
+  const gateIntro = document.getElementById('gateIntro');
 
   const toArabicDigits = (n) =>
     String(n).replace(/\d/g, (d) => '٠١٢٣٤٥٦٧٨٩'[Number(d)]);
@@ -73,7 +73,7 @@
   /* ---------- وضع تقليل الحركة أو غياب GSAP ---------- */
   if (REDUCED || !window.gsap) {
     document.body.classList.add('no-anim');
-    if (preloader) preloader.remove();
+    if (gateIntro) gateIntro.remove();
     document.querySelectorAll('.lang__fill').forEach((f) =>
       f.style.setProperty('--w', f.dataset.width + '%')
     );
@@ -84,11 +84,11 @@
   gsap.registerPlugin(ScrollTrigger);
   window.__animReady = true;
 
-  /* الأقنعة الابتدائية للكلمات */
+  /* أقنعة الكلمات الابتدائية */
   gsap.set('.word__inner', { yPercent: 110 });
 
   /* ============================================================
-     1) شاشة التحميل: انفتاح بوابتَي عشتار ثم دخول الهيرو
+     1) بوابة عشتار: انفتاح ثلاثي الأبعاد ثم دخول الهيرو
      ============================================================ */
   function heroIntro() {
     const tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
@@ -104,32 +104,53 @@
   gsap.set('[data-hero]:not([data-split])', { y: 36, opacity: 0 });
   gsap.set('.hero__scroll', { opacity: 0 });
 
-  if (preloader) {
-    const countEl = document.getElementById('preloaderCount');
-    const barEl = document.getElementById('preloaderBar');
-    const counter = { v: 0 };
+  function playGateIntro() {
+    if (!gateIntro) { heroIntro(); return; }
 
-    gsap.to(counter, {
-      v: 100,
-      duration: 2,
-      ease: 'power2.inOut',
-      onUpdate() {
-        const val = Math.round(counter.v);
-        countEl.textContent = toArabicDigits(val);
-        barEl.style.width = val + '%';
-      },
+    document.body.style.overflow = 'hidden';
+    const tl = gsap.timeline({
       onComplete() {
-        gsap.timeline()
-          .to('.preloader__inner', { y: -30, opacity: 0, duration: 0.45, ease: 'power2.in' })
-          .to('.gate--start', { xPercent: 102, duration: 1.15, ease: 'power4.inOut' }, '-=0.1')
-          .to('.gate--end', { xPercent: -102, duration: 1.15, ease: 'power4.inOut' }, '<')
-          .set(preloader, { display: 'none' })
-          .add(heroIntro, '-=0.75');
+        document.body.style.overflow = '';
+        gateIntro.remove();
       },
     });
-  } else {
-    heroIntro();
+
+    /* النص المركزي يظهر بهدوء */
+    tl.from('#gateCenter', { opacity: 0, y: 24, duration: 0.8, ease: 'power3.out' })
+      .to('#gateCenter', { opacity: 0, y: -18, duration: 0.5, ease: 'power2.in' }, '+=0.55');
+
+    /* الضوء يتسرب من الشق قبل الفتح */
+    tl.to('#gateLight', { opacity: 1, scaleX: 1, duration: 0.7, ease: 'power2.out' }, '-=0.25');
+
+    /* البابان ينفتحان بعمق ثلاثي الأبعاد */
+    tl.to('.gate-door--start', {
+      rotateY: 104,
+      duration: 1.9,
+      ease: 'power3.inOut',
+    }, '-=0.45')
+      .to('.gate-door--end', {
+        rotateY: -104,
+        duration: 1.9,
+        ease: 'power3.inOut',
+      }, '<')
+      .to('.gate-door__edge', { opacity: 1, duration: 0.9 }, '<')
+      .to('#gateLight', { opacity: 0, duration: 1.1, ease: 'power1.out' }, '<0.35');
+
+    /* إزالة البوابة وكشف الهيرو */
+    tl.to(gateIntro, {
+      opacity: 0,
+      duration: 0.6,
+      ease: 'power2.out',
+      onComplete() {
+        gateIntro.classList.add('is-open');
+      },
+    }, '-=0.95')
+      .add(heroIntro, '-=0.5');
+
+    /* الضغط في أي مكان يسرّع الفتح */
+    gateIntro.addEventListener('click', () => tl.timeScale(2.4), { once: true });
   }
+  playGateIntro();
 
   /* ============================================================
      2) الستائر اللازوردية بين الأقسام
@@ -181,7 +202,7 @@
   });
 
   /* ============================================================
-     4) كشف الصور السينمائي + Parallax
+     4) كشف الصور السينمائي + Parallax مباشر على transform
      ============================================================ */
   gsap.utils.toArray('[data-img-reveal]').forEach((wrap) => {
     gsap.fromTo(wrap,
@@ -198,15 +219,15 @@
 
   gsap.utils.toArray('[data-parallax-img]').forEach((img) => {
     gsap.fromTo(img,
-      { '--py': '-28px' },
+      { y: -26 },
       {
-        '--py': '28px',
+        y: 26,
         ease: 'none',
         scrollTrigger: {
           trigger: img.closest('[data-img-reveal]') || img.parentElement,
           start: 'top bottom',
           end: 'bottom top',
-          scrub: 1.2,
+          scrub: 0.8,
         },
       }
     );
@@ -293,7 +314,6 @@
     scrollTrigger: { start: 0, end: 'max', scrub: 0.3 },
   });
 
-  /* كرات الضوء */
   gsap.utils.toArray('[data-parallax]').forEach((el) => {
     const speed = parseFloat(el.dataset.parallax) * 120;
     gsap.fromTo(el,
@@ -317,10 +337,16 @@
   const nav = document.getElementById('nav');
   const toTop = document.getElementById('toTop');
 
+  let scrollTicking = false;
   function onScroll() {
-    const y = window.scrollY;
-    nav.classList.toggle('is-scrolled', y > 40);
-    toTop.classList.toggle('is-visible', y > 600);
+    if (scrollTicking) return;
+    scrollTicking = true;
+    requestAnimationFrame(() => {
+      const y = window.scrollY;
+      nav.classList.toggle('is-scrolled', y > 40);
+      toTop.classList.toggle('is-visible', y > 600);
+      scrollTicking = false;
+    });
   }
   window.addEventListener('scroll', onScroll, { passive: true });
   onScroll();
@@ -425,17 +451,36 @@
   });
 
   /* ============================================================
-     10) غبار بابل الذهبي على Canvas
+     10) غبار بابل — sprites مرسومة مسبقاً + إيقاف خارج الشاشة
      ============================================================ */
   function initDust() {
     const canvas = document.getElementById('dust');
-    if (!canvas) return;
+    const hero = document.getElementById('hero');
+    if (!canvas || !hero) return;
     const ctx = canvas.getContext('2d');
     let w = 0, h = 0, raf = 0;
     let particles = [];
+    let visible = true;
+
+    /* نرسم شكل الغبارة مرة واحدة بدل createRadialGradient كل إطار */
+    function makeSprite(rgb) {
+      const s = document.createElement('canvas');
+      const size = 32;
+      s.width = size; s.height = size;
+      const c = s.getContext('2d');
+      const g = c.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+      g.addColorStop(0, `rgba(${rgb},0.95)`);
+      g.addColorStop(0.35, `rgba(${rgb},0.45)`);
+      g.addColorStop(1, `rgba(${rgb},0)`);
+      c.fillStyle = g;
+      c.fillRect(0, 0, size, size);
+      return s;
+    }
+    const goldSprite = makeSprite('216,181,106');
+    const blueSprite = makeSprite('125,180,238');
 
     function resize() {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.6);
       w = canvas.clientWidth;
       h = canvas.clientHeight;
       canvas.width = w * dpr;
@@ -445,16 +490,16 @@
     }
 
     function seed() {
-      const count = Math.min(80, Math.floor((w * h) / 16000));
+      const count = Math.min(46, Math.floor((w * h) / 26000));
       particles = Array.from({ length: count }, () => ({
         x: Math.random() * w,
         y: Math.random() * h,
-        r: Math.random() * 2.2 + 0.6,
-        vy: -(Math.random() * 0.35 + 0.12),
+        r: Math.random() * 2 + 0.7,
+        vy: -(Math.random() * 0.3 + 0.1),
         sway: Math.random() * Math.PI * 2,
-        swaySp: Math.random() * 0.015 + 0.005,
+        swaySp: Math.random() * 0.012 + 0.004,
         gold: Math.random() > 0.35,
-        alpha: Math.random() * 0.5 + 0.2,
+        alpha: Math.random() * 0.45 + 0.2,
       }));
     }
 
@@ -463,33 +508,41 @@
       for (const p of particles) {
         p.y += p.vy;
         p.sway += p.swaySp;
-        p.x += Math.sin(p.sway) * 0.25;
-        if (p.y < -10) { p.y = h + 10; p.x = Math.random() * w; }
+        p.x += Math.sin(p.sway) * 0.22;
+        if (p.y < -12) { p.y = h + 12; p.x = Math.random() * w; }
 
-        const color = p.gold ? '216,181,106' : '125,180,238';
-        const glow = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 4);
-        glow.addColorStop(0, `rgba(${color},${p.alpha})`);
-        glow.addColorStop(1, `rgba(${color},0)`);
-        ctx.fillStyle = glow;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r * 4, 0, Math.PI * 2);
-        ctx.fill();
-
-        ctx.fillStyle = `rgba(${color},${Math.min(1, p.alpha + 0.35)})`;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fill();
+        ctx.globalAlpha = p.alpha;
+        const size = p.r * 7;
+        ctx.drawImage(p.gold ? goldSprite : blueSprite, p.x - size / 2, p.y - size / 2, size, size);
       }
+      ctx.globalAlpha = 1;
       raf = requestAnimationFrame(frame);
+    }
+
+    function start() {
+      if (raf || !visible) return;
+      raf = requestAnimationFrame(frame);
+    }
+    function stop() {
+      cancelAnimationFrame(raf);
+      raf = 0;
+    }
+
+    /* إيقاف الرسم كلياً عندما يغادر الهيرو الشاشة */
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver((entries) => {
+        visible = entries[0].isIntersecting;
+        visible ? start() : stop();
+      }, { threshold: 0 }).observe(hero);
     }
 
     resize();
     window.addEventListener('resize', resize);
-    raf = requestAnimationFrame(frame);
+    start();
 
     document.addEventListener('visibilitychange', () => {
-      if (document.hidden) cancelAnimationFrame(raf);
-      else raf = requestAnimationFrame(frame);
+      if (document.hidden) stop();
+      else start();
     });
   }
   initDust();
@@ -500,11 +553,8 @@
   }
   window.addEventListener('load', () => ScrollTrigger.refresh());
 
-  /* شبكة أمان */
+  /* شبكة أمان: أي فشل غير متوقع لا يخفي المحتوى */
   setTimeout(() => {
-    if (!window.__animReady) {
-      document.body.classList.add('no-anim');
-      if (preloader) preloader.remove();
-    }
-  }, 4000);
+    if (!window.__animReady && gateIntro) gateIntro.remove();
+  }, 5000);
 })();

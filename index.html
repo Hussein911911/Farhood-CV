@@ -11,21 +11,50 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23070d18'/%3E%3Cg fill='none' stroke='%23d8b56a' stroke-width='1.6'%3E%3Crect x='7' y='7' width='18' height='18'/%3E%3Crect x='7' y='7' width='18' height='18' transform='rotate(45 16 16)'/%3E%3C/g%3E%3C/svg%3E" />
   <link rel="stylesheet" href="css/fonts.css" />
   <link rel="stylesheet" href="css/style.css" />
+  <noscript><style>.gate-intro{display:none!important}</style></noscript>
 </head>
 <body>
 
-  <!-- ===== شاشة التحميل: بوابتا عشتار ===== -->
-  <div class="preloader" id="preloader" aria-hidden="true">
-    <div class="gate gate--start"></div>
-    <div class="gate gate--end"></div>
-    <div class="preloader__inner">
-      <div class="preloader__mark">
-        <svg viewBox="0 0 32 32" width="44" height="44"><g fill="none" stroke="currentColor" stroke-width="1.5"><rect x="7" y="7" width="18" height="18"/><rect x="7" y="7" width="18" height="18" transform="rotate(45 16 16)"/></g></svg>
+  <!-- ===== بوابة عشتار: تُفتح عند أول زيارة ===== -->
+  <div class="gate-intro" id="gateIntro" aria-hidden="true">
+    <div class="gate-light" id="gateLight"></div>
+
+    <div class="gate-door gate-door--start">
+      <div class="gate-door__face">
+        <div class="gate-door__lintel">
+          <svg viewBox="0 0 32 32" width="20" height="20"><g fill="none" stroke="currentColor" stroke-width="1.6"><rect x="7" y="7" width="18" height="18"/><rect x="7" y="7" width="18" height="18" transform="rotate(45 16 16)"/></g></svg>
+          <span>بوابة عشتار</span>
+          <svg viewBox="0 0 32 32" width="20" height="20"><g fill="none" stroke="currentColor" stroke-width="1.6"><rect x="7" y="7" width="18" height="18"/><rect x="7" y="7" width="18" height="18" transform="rotate(45 16 16)"/></g></svg>
+        </div>
+        <div class="gate-door__relief">
+          <svg viewBox="0 0 64 64" width="46" height="46"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 44c0-12 8-20 18-20s18 8 18 20"/><path d="M20 44V30m24 14V30M14 44h36"/><path d="M26 24l-4-8m16 8 4-8M32 24v-9"/><circle cx="26" cy="33" r="1.6" fill="currentColor"/><circle cx="38" cy="33" r="1.6" fill="currentColor"/></g></svg>
+        </div>
+        <div class="gate-door__arch"></div>
+        <div class="gate-door__edge"></div>
       </div>
-      <div class="preloader__count"><span id="preloaderCount">٠</span><small>٪</small></div>
-      <div class="preloader__name">حسين عباس فرهود</div>
-      <div class="preloader__bar"><span id="preloaderBar"></span></div>
-      <div class="preloader__hint">من بابل الحضارة…</div>
+    </div>
+
+    <div class="gate-door gate-door--end">
+      <div class="gate-door__face">
+        <div class="gate-door__lintel">
+          <svg viewBox="0 0 32 32" width="20" height="20"><g fill="none" stroke="currentColor" stroke-width="1.6"><rect x="7" y="7" width="18" height="18"/><rect x="7" y="7" width="18" height="18" transform="rotate(45 16 16)"/></g></svg>
+          <span>بابل — العراق</span>
+          <svg viewBox="0 0 32 32" width="20" height="20"><g fill="none" stroke="currentColor" stroke-width="1.6"><rect x="7" y="7" width="18" height="18"/><rect x="7" y="7" width="18" height="18" transform="rotate(45 16 16)"/></g></svg>
+        </div>
+        <div class="gate-door__relief">
+          <svg viewBox="0 0 64 64" width="46" height="46"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 44c0-12 8-20 18-20s18 8 18 20"/><path d="M20 44V30m24 14V30M14 44h36"/><path d="M26 24l-4-8m16 8 4-8M32 24v-9"/><circle cx="26" cy="33" r="1.6" fill="currentColor"/><circle cx="38" cy="33" r="1.6" fill="currentColor"/></g></svg>
+        </div>
+        <div class="gate-door__arch"></div>
+        <div class="gate-door__edge"></div>
+      </div>
+    </div>
+
+    <div class="gate-intro__center" id="gateCenter">
+      <div class="gate-intro__star">
+        <svg viewBox="0 0 32 32" width="40" height="40"><g fill="none" stroke="currentColor" stroke-width="1.5"><rect x="7" y="7" width="18" height="18"/><rect x="7" y="7" width="18" height="18" transform="rotate(45 16 16)"/></g></svg>
+      </div>
+      <p class="gate-intro__name">حسين عباس فرهود</p>
+      <span class="gate-intro__role">مهندس وراثي</span>
     </div>
   </div>
 
@@ -113,7 +142,7 @@
         </p>
 
         <p class="hero__subtitle" data-hero>
-          أحمل إرث مدينة علّمت العالم الطب والكتابة، وأمضي اليوم في مختبر الهندسة الوراثية
+          يحمل إرث مدينة علّمت العالم الطب والكتابة، ويمضي اليوم في الهندسة الوراثية
           والتقانات الإحيائية — حيث يلتقي عراقة بابل بطموح العلم الحديث.
         </p>
 
@@ -207,14 +236,18 @@
 
           <div class="about__text glass tilt-card" data-reveal data-cursor="hover">
             <p>
-              أنا <b>حسين عباس فرهود</b>، مهندس وراثي من <b>بابل — العراق</b>، المدينة التي
-              احتضنت أول مدرسة طب في التاريخ ودوّن أهلها أول حرف مسماري.
+              <b>حسين عباس فرهود</b> مهندس وراثي من <b>بابل – العراق</b>، حاصل على بكالوريوس
+              الهندسة الوراثية من جامعة القاسم الخضراء، كلية التقانات الإحيائية، قسم الهندسة
+              الوراثية. ينتمي إلى مدينة علّمت العالم الطب والكتابة، ويمضي اليوم على امتداد
+              تلك الحكاية في مختبرات العلوم الحديثة.
             </p>
             <p>
-              تخرّجت في <b>جامعة القاسم الخضراء</b> — كلية التقانات الإحيائية، قسم الهندسة
-              الوراثية، وأعمل اليوم على امتداد تلك الحكاية: أجمع بين الخبرة في <b>القطاع الصحي
-              والدوائي</b> والمهارات المختبرية والتقانية، مع اهتمام بالأدوات الرقمية وتقنيات
-              الويب التي توظّف العلم في حلول واقعية.
+              اكتسب خبرة عملية في <b>القطاع الصحي والدوائي</b> من خلال عمله في مكتب علمي
+              ودوائي متخصص بتوريد وبيع الأدوية والمستلزمات الطبية، وعزّز كفاءته المختبرية
+              بدورة تخصصية في التحليلات المرضية. وإلى جانب مهاراته في التحليل المخبري
+              والتقانات الإحيائية وتطبيقات الهندسة الوراثية، يمتلك مهارات رقمية ومعرفة
+              عملية بتقنيات الويب، ويسعى لتوظيف هذا المزيج بين العلم والتقنية في إحداث
+              أثر ملموس داخل القطاع الصحي والبحثي.
             </p>
             <div class="about__chips">
               <span>دقة مختبرية</span>
