@@ -94,6 +94,7 @@
         <a href="#education" data-cursor="hover">المؤهل</a>
         <a href="#gallery" data-cursor="hover">معرض بابل</a>
         <a href="#experience" data-cursor="hover">الخبرات</a>
+        <a href="#certificates" data-cursor="hover">الشهادات</a>
         <a href="#skills" data-cursor="hover">المهارات</a>
         <a href="#contact" data-cursor="hover">تواصل</a>
       </nav>
@@ -114,8 +115,9 @@
       <a href="#education"><em>٠٢</em> المؤهل العلمي</a>
       <a href="#gallery"><em>٠٣</em> معرض بابل</a>
       <a href="#experience"><em>٠٤</em> الخبرات</a>
-      <a href="#skills"><em>٠٥</em> المهارات</a>
-      <a href="#contact"><em>٠٦</em> تواصل</a>
+      <a href="#certificates"><em>٠٥</em> الشهادات</a>
+      <a href="#skills"><em>٠٦</em> المهارات</a>
+      <a href="#contact"><em>٠٧</em> تواصل</a>
     </nav>
     <div class="mobile-menu__foot">
       <span>بابل — العراق</span>
@@ -469,27 +471,79 @@
                 <li>إتقان أساليب التحليل المخبري</li>
                 <li>انضباط عالٍ في معايير الفحص والدقة</li>
               </ul>
-              <button class="cert-btn" id="openCert" data-cursor="hover" type="button" aria-haspopup="dialog" aria-controls="certLightbox">
-                <span class="cert-btn__thumb">
-                  <img src="assets/certificate.jpg" alt="شهادة دورة التحليل المخبري الطبي" loading="lazy" />
-                </span>
-                <span class="cert-btn__label">
-                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
-                  عرض الشهادة الرسمية
-                </span>
-              </button>
+              <a class="cert-inline" href="#certificates" data-cursor="hover">
+                <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="6"/><path d="m9 14-1.5 7L12 19.5 16.5 21 15 14"/></svg>
+                الشهادة الرسمية موثّقة في قسم الشهادات
+              </a>
             </div>
           </article>
         </div>
       </div>
     </section>
 
-    <!-- ===== المهارات ===== -->
-    <section class="section section--alt" id="skills" data-curtain>
+    <!-- ===== الشهادات ===== -->
+    <section class="section section--alt" id="certificates" data-curtain>
       <span class="curtain" aria-hidden="true"></span>
       <div class="container">
         <header class="section__head" data-reveal>
           <span class="section__index">٠٥</span>
+          <div>
+            <span class="section__tag">وثائق معتمدة</span>
+            <h2 class="section__title" data-split>الشهادات</h2>
+          </div>
+          <span class="section__line"></span>
+        </header>
+
+        <div class="cert-grid">
+          <button class="cert-frame tilt-card" data-open-cert data-img-reveal data-cursor="hover" type="button" aria-haspopup="dialog" aria-controls="certLightbox" aria-label="عرض الشهادة بحجم مكبّر">
+            <span class="cert-frame__star cert-frame__star--tl" aria-hidden="true">
+              <svg viewBox="0 0 32 32" width="20" height="20"><g fill="none" stroke="currentColor" stroke-width="1.5"><rect x="8" y="8" width="16" height="16"/><rect x="8" y="8" width="16" height="16" transform="rotate(45 16 16)"/></g></svg>
+            </span>
+            <span class="cert-frame__star cert-frame__star--tr" aria-hidden="true">
+              <svg viewBox="0 0 32 32" width="20" height="20"><g fill="none" stroke="currentColor" stroke-width="1.5"><rect x="8" y="8" width="16" height="16"/><rect x="8" y="8" width="16" height="16" transform="rotate(45 16 16)"/></g></svg>
+            </span>
+            <span class="cert-frame__star cert-frame__star--bl" aria-hidden="true">
+              <svg viewBox="0 0 32 32" width="20" height="20"><g fill="none" stroke="currentColor" stroke-width="1.5"><rect x="8" y="8" width="16" height="16"/><rect x="8" y="8" width="16" height="16" transform="rotate(45 16 16)"/></g></svg>
+            </span>
+            <span class="cert-frame__star cert-frame__star--br" aria-hidden="true">
+              <svg viewBox="0 0 32 32" width="20" height="20"><g fill="none" stroke="currentColor" stroke-width="1.5"><rect x="8" y="8" width="16" height="16"/><rect x="8" y="8" width="16" height="16" transform="rotate(45 16 16)"/></g></svg>
+            </span>
+            <img src="assets/certificate.jpg" alt="شهادة إتمام دورة التحليل المخبري الطبي — Pulse Training Center" loading="lazy" />
+            <span class="cert-frame__overlay">
+              <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3M11 8v6M8 11h6"/></svg>
+              <b>اضغط للعرض المكبّر</b>
+            </span>
+          </button>
+
+          <div class="cert-info glass tilt-card" data-reveal data-cursor="hover">
+            <div class="cert-info__seal">
+              <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="6"/><path d="m9 14-1.5 7L12 19.5 16.5 21 15 14"/><path d="M12 6.5v5M9.7 8.9l2.3 2.1 2.3-2.1"/></svg>
+            </div>
+            <span class="cert-info__chip">شهادة إتمام معتمدة</span>
+            <h3>دورة التحليل المخبري الطبي</h3>
+            <p class="cert-info__en" dir="ltr">Medical Laboratory Analysis Course</p>
+            <ul class="cert-info__list">
+              <li><b>الجهة المانحة</b><span dir="ltr">Pulse Training Center (P.T.C)</span></li>
+              <li><b>المدة التدريبية</b><span>٣٦ ساعة معتمدة</span></li>
+              <li><b>تاريخ الإصدار</b><span>أكتوبر ٢٠٢٤</span></li>
+              <li><b>التجديد الموصى به</b><span>أكتوبر ٢٠٢٨</span></li>
+              <li><b>رمز الشهادة</b><span dir="ltr">MLA-102816</span></li>
+            </ul>
+            <button class="btn btn--gold cert-info__btn" data-open-cert data-cursor="hover" type="button" aria-haspopup="dialog" aria-controls="certLightbox">
+              <span>عرض الشهادة كاملة</span>
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== المهارات ===== -->
+    <section class="section" id="skills" data-curtain>
+      <span class="curtain" aria-hidden="true"></span>
+      <div class="container">
+        <header class="section__head" data-reveal>
+          <span class="section__index">٠٦</span>
           <div>
             <span class="section__tag">مصدر القوة</span>
             <h2 class="section__title" data-split>المهارات والكفاءات</h2>
@@ -564,7 +618,7 @@
       <div class="bg-orb bg-orb--three" data-parallax="0.2"></div>
       <div class="container">
         <header class="section__head" data-reveal>
-          <span class="section__index">٠٦</span>
+          <span class="section__index">٠٧</span>
           <div>
             <span class="section__tag">الخطوة القادمة</span>
             <h2 class="section__title" data-split>لنتحدث من قلب بابل</h2>

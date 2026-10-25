@@ -502,6 +502,7 @@ body.menu-open .mobile-menu__links a:nth-child(3) { transition-delay: 0.22s; }
 body.menu-open .mobile-menu__links a:nth-child(4) { transition-delay: 0.28s; }
 body.menu-open .mobile-menu__links a:nth-child(5) { transition-delay: 0.34s; }
 body.menu-open .mobile-menu__links a:nth-child(6) { transition-delay: 0.4s; }
+body.menu-open .mobile-menu__links a:nth-child(7) { transition-delay: 0.46s; }
 .mobile-menu__links a em { font-style: normal; font-size: 0.9rem; color: var(--gold); }
 .mobile-menu__links a:hover { color: var(--gold-2); }
 .mobile-menu__foot {
@@ -1156,46 +1157,171 @@ body.menu-open .mobile-menu__links a:nth-child(6) { transition-delay: 0.4s; }
 }
 .timeline__meta span:nth-child(2) { color: var(--gold); }
 
-/* زر عرض الشهادة */
-.cert-btn {
-  margin-top: 22px;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 12px;
-  border-radius: var(--radius);
-  border: 1px solid var(--line);
-  background: rgba(47, 109, 179, 0.12);
-  text-align: start;
-  transition: border-color 0.4s var(--ease-out), background 0.4s, transform 0.4s var(--ease-out);
-}
-.cert-btn:hover {
-  border-color: var(--line-strong);
-  background: rgba(47, 109, 179, 0.24);
-  transform: translateY(-3px);
-}
-.cert-btn__thumb {
-  flex-shrink: 0;
-  width: 96px;
-  aspect-ratio: 1600 / 1140;
-  border-radius: 10px;
-  overflow: hidden;
-  border: 1px solid var(--line-strong);
-  box-shadow: 0 8px 22px -10px rgba(0, 0, 0, 0.7);
-}
-.cert-btn__thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s var(--ease-out); }
-.cert-btn:hover .cert-btn__thumb img { transform: scale(1.06); }
-.cert-btn__label {
+/* إحالة داخل الخط الزمني إلى قسم الشهادات */
+.cert-inline {
+  margin-top: 20px;
   display: inline-flex;
   align-items: center;
+  gap: 9px;
+  padding: 9px 18px;
+  border-radius: 999px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--gold-2);
+  border: 1px solid var(--line);
+  background: rgba(47, 109, 179, 0.14);
+  transition: background 0.35s, border-color 0.35s, transform 0.35s var(--ease-out);
+}
+.cert-inline svg { color: var(--gold); flex-shrink: 0; }
+.cert-inline:hover {
+  background: rgba(47, 109, 179, 0.28);
+  border-color: var(--line-strong);
+  transform: translateY(-2px);
+}
+
+/* ============ قسم الشهادات ============ */
+.cert-grid {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: 28px;
+  align-items: stretch;
+}
+
+/* الإطار المزخرف للشهادة */
+.cert-frame {
+  position: relative;
+  padding: 16px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--line-strong);
+  background: linear-gradient(155deg, rgba(30, 56, 92, 0.92), rgba(11, 22, 38, 0.95));
+  box-shadow: var(--shadow-lapis);
+  overflow: hidden;
+  text-align: start;
+  cursor: zoom-in;
+}
+.cert-frame::before {
+  content: '';
+  position: absolute;
+  inset: 9px;
+  border: 1px solid rgba(216, 181, 106, 0.4);
+  border-radius: 14px;
+  pointer-events: none;
+  z-index: 2;
+  transition: inset 0.5s var(--ease-out), border-color 0.5s;
+}
+.cert-frame:hover::before { inset: 13px; border-color: rgba(243, 226, 179, 0.7); }
+.cert-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 12px;
+  display: block;
+}
+.cert-frame__star {
+  position: absolute;
+  z-index: 3;
+  width: 38px; height: 38px;
+  display: grid;
+  place-items: center;
+  color: var(--gold);
+  background: rgba(7, 13, 24, 0.85);
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  box-shadow: 0 6px 18px -8px rgba(0, 0, 0, 0.8);
+}
+.cert-frame__star--tl { top: 22px; inset-inline-start: 22px; }
+.cert-frame__star--tr { top: 22px; inset-inline-end: 22px; }
+.cert-frame__star--bl { bottom: 22px; inset-inline-start: 22px; }
+.cert-frame__star--br { bottom: 22px; inset-inline-end: 22px; }
+
+.cert-frame__overlay {
+  position: absolute;
+  inset: 16px;
+  z-index: 2;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   gap: 10px;
+  color: var(--gold-2);
   font-family: var(--font-head);
   font-weight: 700;
-  color: var(--gold-2);
-  font-size: 0.98rem;
+  background: rgba(7, 13, 24, 0.55);
+  opacity: 0;
+  transition: opacity 0.45s var(--ease-out);
 }
-.cert-btn__label svg { color: var(--gold); flex-shrink: 0; }
+.cert-frame__overlay svg { color: var(--gold); }
+.cert-frame:hover .cert-frame__overlay { opacity: 1; }
+
+/* بطاقة بيانات الشهادة */
+.cert-info {
+  padding: clamp(26px, 3.4vw, 40px);
+  display: flex;
+  flex-direction: column;
+}
+.cert-info__seal {
+  width: 62px; height: 62px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: var(--gold);
+  background: linear-gradient(150deg, rgba(47, 109, 179, 0.4), rgba(216, 181, 106, 0.1));
+  border: 1px solid var(--line-strong);
+  box-shadow: var(--shadow-gold);
+  margin-bottom: 18px;
+}
+.cert-info__chip {
+  align-self: flex-start;
+  padding: 5px 16px;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  color: var(--lapis-bright);
+  background: rgba(47, 109, 179, 0.2);
+  border: 1px solid rgba(125, 180, 238, 0.35);
+  margin-bottom: 14px;
+}
+.cert-info h3 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(1.35rem, 3vw, 1.8rem);
+  line-height: 1.4;
+  margin-bottom: 4px;
+}
+.cert-info__en {
+  color: var(--muted);
+  font-size: 0.9rem;
+  letter-spacing: 0.4px;
+  margin-bottom: 22px;
+}
+.cert-info__list {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 26px;
+}
+.cert-info__list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 11px 16px;
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(176, 141, 87, 0.14);
+  font-size: 0.94rem;
+}
+.cert-info__list b {
+  font-family: var(--font-head);
+  color: var(--gold-2);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.cert-info__list span { color: var(--ink); text-align: end; }
+.cert-info__btn { align-self: flex-start; margin-top: auto; }
+
+@media (max-width: 960px) {
+  .cert-grid { grid-template-columns: 1fr; }
+}
 
 /* نافذة العرض المكبّر */
 .lightbox {
@@ -1261,7 +1387,12 @@ body.menu-open .mobile-menu__links a:nth-child(6) { transition-delay: 0.4s; }
 @media (max-width: 620px) {
   .lightbox { padding: 3vh 3vw; }
   .lightbox__close { top: -14px; inset-inline-end: 0; width: 42px; height: 42px; }
-  .cert-btn__thumb { width: 80px; }
+  .cert-frame { padding: 10px; }
+  .cert-frame__star { width: 30px; height: 30px; }
+  .cert-frame__star--tl, .cert-frame__star--tr { top: 16px; }
+  .cert-frame__star--bl, .cert-frame__star--br { bottom: 16px; }
+  .cert-frame__star--tl, .cert-frame__star--bl { inset-inline-start: 16px; }
+  .cert-frame__star--tr, .cert-frame__star--br { inset-inline-end: 16px; }
 }
 
 /* ============ المهارات ============ */
@@ -1437,7 +1568,8 @@ a.contact__card:hover { transform: translateY(-6px); }
 
 /* الموبايل: إطفاء الـblur المكلف نهائياً لسلاسة التمرير */
 @media (pointer: coarse) {
-  .nav, .mobile-menu, .hero__eyebrow, .btn--ghost, .gcard__num, .glass {
+  .nav, .mobile-menu, .hero__eyebrow, .btn--ghost, .gcard__num, .glass,
+  .lightbox__backdrop {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
   }
@@ -1451,6 +1583,12 @@ a.contact__card:hover { transform: translateY(-6px); }
   .edu { grid-template-columns: 1fr; }
   .edu__visual { min-height: 240px; }
   .edu__stamp { display: none; }
+}
+
+@media (max-width: 1120px) and (min-width: 861px) {
+  .nav__links { gap: 0; }
+  .nav__links a { padding: 9px 10px; font-size: 0.86rem; }
+  .nav__brand-text { font-size: 1rem; }
 }
 
 @media (max-width: 860px) {
