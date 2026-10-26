@@ -367,6 +367,8 @@ body.menu-open .mobile-menu__links a:nth-child(7) { transition-delay: 0.46s; }
   background: linear-gradient(90deg, rgba(18, 58, 102, 0.4), rgba(216, 181, 106, 0.08), rgba(18, 58, 102, 0.4)); overflow: hidden;
   -webkit-mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
   mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+  /* دخول ناعم للشريط كاملاً — بلا ظهور مفاجئ */
+  opacity: 0; animation: marquee-in 1.5s var(--ease) 0.2s forwards;
 }
 /* نسخة داخل قسم المؤهل: شريط محاط بإطار تحت بطاقة الجامعة */
 .marquee--inside {
@@ -374,13 +376,17 @@ body.menu-open .mobile-menu__links a:nth-child(7) { transition-delay: 0.46s; }
   border: 1px solid var(--line); border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lapis);
 }
-.marquee__track { display: flex; direction: ltr; width: max-content; will-change: transform; animation: marquee 38s linear infinite; }
-.marquee:hover .marquee__track { animation-play-state: paused; }
-.marquee__group { display: flex; align-items: center; gap: 38px; padding-inline: 19px; direction: rtl; }
+.marquee__track {
+  display: flex; direction: ltr; width: max-content;
+  will-change: transform; backface-visibility: hidden; -webkit-backface-visibility: hidden;
+  animation: marquee 44s linear infinite;
+}
+.marquee__group { display: flex; align-items: center; gap: 38px; padding-inline: 19px; direction: rtl; flex-shrink: 0; }
 .marquee__group span { font-family: var(--font-head); font-weight: 700; font-size: 1.12rem; color: var(--ink); white-space: nowrap; }
 .marquee__group i { color: var(--gold); font-style: normal; font-size: 0.85rem; }
-/* حركة من اليسار إلى اليمين لتناسب قراءة العربية */
-@keyframes marquee { from { transform: translateX(-50%); } to { transform: translateX(0); } }
+/* حركة دائمة من اليسار إلى اليمين — حلقة متصلة بلا قفزة (المجموعتان متطابقتان والإزاحة نصف العرض) */
+@keyframes marquee { from { transform: translate3d(-50%, 0, 0); } to { transform: translate3d(0, 0, 0); } }
+@keyframes marquee-in { from { opacity: 0; } to { opacity: 1; } }
 
 /* ============ الأقسام ============ */
 .section { padding: clamp(90px, 12vh, 150px) 0; }
@@ -801,6 +807,7 @@ html.is-captured body > *:not(.capture-veil) { visibility: hidden !important; }
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
   .marquee__track { animation: none; }
+  .marquee { opacity: 1 !important; animation: none; }
   .hero__bg img { animation: none; transform: none; }
   .gate-intro { display: none !important; }
   [data-pop] { opacity: 1 !important; transform: none !important; }
