@@ -632,6 +632,7 @@ body.menu-open .mobile-menu__links a:nth-child(7) { transition-delay: 0.46s; }
   margin-top: 14px; color: var(--muted); font-size: 0.92rem; text-align: center;
 }
 .profile-card figcaption svg { color: var(--gold); flex-shrink: 0; }
+.profile-card__dl { display: flex; justify-content: center; flex-wrap: wrap; gap: 14px; margin-top: 18px; }
 .contact__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; margin-bottom: 26px; }
 @media (max-width: 620px) { .contact__grid { grid-template-columns: 1fr; } }
 .contact__card { padding: 26px 24px; display: flex; align-items: center; gap: 18px; transition: transform 0.45s var(--ease); }
