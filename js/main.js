@@ -1,6 +1,7 @@
 /* ============================================================
-   حسين عباس فرهود — محرك الحركات البابلي
-   GSAP + ScrollTrigger + Canvas Dust (sprite-optimized)
+   حسين عباس فرهود — محرك الحركات
+   فلسفة الحركة: انبثاق ناعم عند الدخول (Pop Reveals)
+   لا توجد حركات مربوطة بالتمرير — كل شيء يظهر بهدوء مرة واحدة
    ============================================================ */
 
 (function () {
@@ -13,7 +14,7 @@
   const toArabicDigits = (n) =>
     String(n).replace(/\d/g, (d) => '٠١٢٣٤٥٦٧٨٩'[Number(d)]);
 
-  /* ---------- تقسيم الكلمات (آمن للعربية) ---------- */
+  /* ---------- تقسيم كلمات العنوان الرئيسي (آمن للعربية) ---------- */
   function splitWords(el) {
     const words = el.textContent.trim().split(/\s+/);
     el.textContent = '';
@@ -28,23 +29,27 @@
       if (i < words.length - 1) el.appendChild(document.createTextNode(' '));
     });
   }
-  document.querySelectorAll('[data-split]').forEach(splitWords);
+  const heroTitle = document.querySelector('.hero__title[data-split]');
+  if (heroTitle) splitWords(heroTitle);
 
-  /* ---------- نافذة عرض الشهادة (تعمل بدون GSAP أيضاً) ---------- */
+  /* ---------- نافذة العرض المكبّر العامة ---------- */
   (function initLightbox() {
-    const openBtns = document.querySelectorAll('[data-open-cert]');
-    const box = document.getElementById('certLightbox');
-    if (!openBtns.length || !box) return;
-    const closeEls = box.querySelectorAll('[data-close]');
+    const box = document.getElementById('lightbox');
+    const img = document.getElementById('lightboxImg');
+    const caption = document.getElementById('lightboxCaption');
+    const triggers = document.querySelectorAll('[data-lightbox]');
+    if (!box || !img || !triggers.length) return;
     let lastFocus = null;
 
-    function open() {
+    function open(trigger) {
       lastFocus = document.activeElement;
+      img.src = trigger.dataset.full || trigger.querySelector('img')?.src || '';
+      img.alt = trigger.querySelector('img')?.alt || '';
+      caption.textContent = trigger.dataset.caption || '';
       box.classList.add('is-open');
       box.setAttribute('aria-hidden', 'false');
       document.body.style.overflow = 'hidden';
-      const closeBtn = box.querySelector('.lightbox__close');
-      closeBtn && closeBtn.focus();
+      box.querySelector('.lightbox__close')?.focus();
     }
     function close() {
       box.classList.remove('is-open');
@@ -53,14 +58,14 @@
       lastFocus && lastFocus.focus && lastFocus.focus();
     }
 
-    openBtns.forEach((btn) => btn.addEventListener('click', open));
-    closeEls.forEach((el) => el.addEventListener('click', close));
+    triggers.forEach((t) => t.addEventListener('click', () => open(t)));
+    box.querySelectorAll('[data-close]').forEach((el) => el.addEventListener('click', close));
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && box.classList.contains('is-open')) close();
     });
   })();
 
-  /* ---------- تفاعلات أساسية تعمل بدون أنيميشن ---------- */
+  /* ---------- تفاعلات أساسية ---------- */
   function initBasicInteractions() {
     const toTopBtn = document.getElementById('toTop');
     toTopBtn && toTopBtn.addEventListener('click', () =>
@@ -104,21 +109,16 @@
   if (REDUCED || !window.gsap) {
     document.body.classList.add('no-anim');
     if (gateIntro) gateIntro.remove();
-    document.querySelectorAll('.lang__fill').forEach((f) =>
-      f.style.setProperty('--w', f.dataset.width + '%')
-    );
+    document.querySelectorAll('.lang__fill').forEach((f) => { f.style.width = f.dataset.width + '%'; });
+    document.querySelectorAll('.timeline').forEach((t) => t.classList.add('is-visible'));
     initBasicInteractions();
     return;
   }
 
-  gsap.registerPlugin(ScrollTrigger);
-  window.__animReady = true;
-
-  /* أقنعة الكلمات الابتدائية */
-  gsap.set('.word__inner', { yPercent: 110 });
+  initBasicInteractions();
 
   /* ============================================================
-     1) بوابة عشتار: انفتاح ثلاثي الأبعاد ثم دخول الهيرو
+     1) بوابة عشتار ثم دخول الهيرو
      ============================================================ */
   function heroIntro() {
     const tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
@@ -133,6 +133,7 @@
 
   gsap.set('[data-hero]:not([data-split])', { y: 36, opacity: 0 });
   gsap.set('.hero__scroll', { opacity: 0 });
+  gsap.set('.hero__title .word__inner', { yPercent: 110 });
 
   function playGateIntro() {
     if (!gateIntro) { heroIntro(); return; }
@@ -145,244 +146,94 @@
       },
     });
 
-    /* النص المركزي يظهر بهدوء */
     tl.from('#gateCenter', { opacity: 0, y: 24, duration: 0.8, ease: 'power3.out' })
-      .to('#gateCenter', { opacity: 0, y: -18, duration: 0.5, ease: 'power2.in' }, '+=0.55');
-
-    /* الضوء يتسرب من الشق قبل الفتح */
-    tl.to('#gateLight', { opacity: 1, scaleX: 1, duration: 0.7, ease: 'power2.out' }, '-=0.25');
-
-    /* البابان ينفتحان بعمق ثلاثي الأبعاد */
-    tl.to('.gate-door--start', {
-      rotateY: 104,
-      duration: 1.9,
-      ease: 'power3.inOut',
-    }, '-=0.45')
-      .to('.gate-door--end', {
-        rotateY: -104,
-        duration: 1.9,
-        ease: 'power3.inOut',
-      }, '<')
+      .to('#gateCenter', { opacity: 0, y: -18, duration: 0.5, ease: 'power2.in' }, '+=0.55')
+      .to('#gateLight', { opacity: 1, scaleX: 1, duration: 0.7, ease: 'power2.out' }, '-=0.25')
+      .to('.gate-door--start', { rotateY: 104, duration: 1.9, ease: 'power3.inOut' }, '-=0.45')
+      .to('.gate-door--end', { rotateY: -104, duration: 1.9, ease: 'power3.inOut' }, '<')
       .to('.gate-door__edge', { opacity: 1, duration: 0.9 }, '<')
-      .to('#gateLight', { opacity: 0, duration: 1.1, ease: 'power1.out' }, '<0.35');
-
-    /* إزالة البوابة وكشف الهيرو */
-    tl.to(gateIntro, {
-      opacity: 0,
-      duration: 0.6,
-      ease: 'power2.out',
-      onComplete() {
-        gateIntro.classList.add('is-open');
-      },
-    }, '-=0.95')
+      .to('#gateLight', { opacity: 0, duration: 1.1, ease: 'power1.out' }, '<0.35')
+      .to(gateIntro, {
+        opacity: 0, duration: 0.6, ease: 'power2.out',
+        onComplete() { gateIntro.classList.add('is-open'); },
+      }, '-=0.95')
       .add(heroIntro, '-=0.5');
 
-    /* الضغط في أي مكان يسرّع الفتح */
     gateIntro.addEventListener('click', () => tl.timeScale(2.4), { once: true });
   }
   playGateIntro();
 
   /* ============================================================
-     2) الستائر اللازوردية — IntersectionObserver موثوق على الموبايل
-        (لا يتأثر بالـpin أو شريط العنوان المتغير، والحركة تكتمل دائماً)
+     2) نظام الانبثاق الناعم — IntersectionObserver
      ============================================================ */
-  if ('IntersectionObserver' in window) {
-    const curtainIO = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
-        const curtain = entry.target;
-        curtainIO.unobserve(curtain);
-        gsap.fromTo(curtain,
-          { yPercent: 101 },
-          { yPercent: -101, duration: 1.3, ease: 'power4.inOut' }
-        );
+  const popIO = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add('is-visible');
+      popIO.unobserve(entry.target);
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
+
+  document.querySelectorAll('[data-pop-group]').forEach((group) => {
+    const items = group.querySelectorAll('[data-pop]');
+    items.forEach((el, i) => {
+      const delay = Math.min(i * 95, 480);
+      el.style.transitionDelay = delay + 'ms';
+      setTimeout(() => { el.style.transitionDelay = ''; }, 1400 + delay);
+    });
+  });
+  document.querySelectorAll('[data-pop]').forEach((el) => popIO.observe(el));
+
+  /* ============================================================
+     3) العدادات — تنبض once عند الدخول
+     ============================================================ */
+  const counterIO = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      const el = entry.target;
+      counterIO.unobserve(el);
+      const end = Number(el.dataset.count);
+      const state = { v: 0 };
+      gsap.to(state, {
+        v: end, duration: 1.7, ease: 'power2.out',
+        onUpdate() {
+          el.textContent = toArabicDigits(String(Math.round(state.v)).padStart(2, '0'));
+        },
       });
-    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
-    gsap.utils.toArray('.curtain').forEach((c) => curtainIO.observe(c));
-  } else {
-    gsap.utils.toArray('.curtain').forEach((curtain) => {
-      gsap.fromTo(curtain,
-        { yPercent: 101 },
-        {
-          yPercent: -101,
-          duration: 1.3,
-          ease: 'power4.inOut',
-          scrollTrigger: { trigger: curtain.parentElement, start: 'top 72%' },
-        }
-      );
     });
-  }
+  }, { threshold: 0.6 });
+  document.querySelectorAll('[data-count]').forEach((el) => counterIO.observe(el));
 
   /* ============================================================
-     3) انتقالات الظهور وعناوين الأقسام
+     4) أشرطة اللغات — امتلاء ناعم عند الدخول
      ============================================================ */
-  gsap.utils.toArray('[data-reveal]').forEach((el) => {
-    gsap.fromTo(el,
-      { y: 48, opacity: 0 },
-      {
-        y: 0, opacity: 1,
-        duration: 1.05,
-        ease: 'power3.out',
-        scrollTrigger: { trigger: el, start: 'top 89%', once: true },
-      }
-    );
-  });
-
-  gsap.utils.toArray('.section__title').forEach((title) => {
-    gsap.to(title.querySelectorAll('.word__inner'), {
-      yPercent: 0,
-      stagger: 0.09,
-      duration: 0.95,
-      ease: 'power4.out',
-      scrollTrigger: { trigger: title, start: 'top 87%', once: true },
+  const barIO = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      const fill = entry.target;
+      barIO.unobserve(fill);
+      fill.style.width = fill.dataset.width + '%';
     });
-  });
-
-  gsap.utils.toArray('.section__line').forEach((line) => {
-    gsap.from(line, {
-      scaleX: 0,
-      duration: 1.3,
-      ease: 'power3.inOut',
-      scrollTrigger: { trigger: line, start: 'top 85%', once: true },
-    });
-  });
+  }, { threshold: 0.4 });
+  document.querySelectorAll('.lang__fill').forEach((f) => barIO.observe(f));
 
   /* ============================================================
-     4) كشف الصور السينمائي + Parallax مباشر على transform
+     5) خط الخط الزمني ينمو once عند دخول القسم
      ============================================================ */
-  gsap.utils.toArray('[data-img-reveal]').forEach((wrap) => {
-    gsap.fromTo(wrap,
-      { clipPath: 'inset(12% 7% 12% 7%)', opacity: 0.4 },
-      {
-        clipPath: 'inset(0% 0% 0% 0%)',
-        opacity: 1,
-        duration: 1.4,
-        ease: 'power4.out',
-        scrollTrigger: { trigger: wrap, start: 'top 88%', once: true },
-      }
-    );
-  });
-
-  gsap.utils.toArray('[data-parallax-img]').forEach((img) => {
-    gsap.fromTo(img,
-      { y: -26 },
-      {
-        y: 26,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: img.closest('[data-img-reveal]') || img.parentElement,
-          start: 'top bottom',
-          end: 'bottom top',
-          scrub: 0.8,
-        },
-      }
-    );
-  });
+  const timelineIO = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add('is-visible');
+      timelineIO.unobserve(entry.target);
+    });
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.timeline').forEach((t) => timelineIO.observe(t));
 
   /* ============================================================
-     5) معرض بابل — تمرير أفلي مثبّت
-     ============================================================ */
-  const gallery = document.getElementById('gallery');
-  const track = document.getElementById('galleryTrack');
-  const viewport = document.getElementById('galleryViewport');
-  const galleryProgress = document.getElementById('galleryProgress');
-
-  if (gallery && track) {
-    const getDistance = () => Math.max(0, track.scrollWidth - window.innerWidth);
-
-    gsap.to(track, {
-      x: () => -getDistance(),
-      ease: 'none',
-      scrollTrigger: {
-        trigger: gallery,
-        start: 'top top',
-        end: () => '+=' + getDistance(),
-        pin: true,
-        scrub: 1,
-        invalidateOnRefresh: true,
-        anticipatePin: 1,
-        onUpdate(self) {
-          if (galleryProgress) galleryProgress.style.width = self.progress * 100 + '%';
-        },
-      },
-    });
-    viewport.classList.add('is-pinned');
-  }
-
-  /* ============================================================
-     6) العدادات والخط الزمني والأشرطة والتقدم
-     ============================================================ */
-  document.querySelectorAll('[data-count]').forEach((el) => {
-    const end = Number(el.dataset.count);
-    ScrollTrigger.create({
-      trigger: el,
-      start: 'top 92%',
-      once: true,
-      onEnter() {
-        const state = { v: 0 };
-        gsap.to(state, {
-          v: end,
-          duration: 1.7,
-          ease: 'power2.out',
-          onUpdate() {
-            el.textContent = toArabicDigits(String(Math.round(state.v)).padStart(2, '0'));
-          },
-        });
-      },
-    });
-  });
-
-  gsap.to('#timelineLine', {
-    scaleY: 1,
-    ease: 'none',
-    scrollTrigger: {
-      trigger: '.timeline',
-      start: 'top 68%',
-      end: 'bottom 70%',
-      scrub: 0.7,
-    },
-  });
-
-  document.querySelectorAll('.lang__fill').forEach((fill) => {
-    const w = fill.dataset.width;
-    fill.style.setProperty('--w', w + '%');
-    gsap.to(fill, {
-      width: w + '%',
-      duration: 1.5,
-      ease: 'power3.inOut',
-      scrollTrigger: { trigger: fill, start: 'top 93%' },
-    });
-  });
-
-  gsap.to('#scrollProgress', {
-    scaleX: 1,
-    ease: 'none',
-    scrollTrigger: { start: 0, end: 'max', scrub: 0.3 },
-  });
-
-  gsap.utils.toArray('[data-parallax]').forEach((el) => {
-    const speed = parseFloat(el.dataset.parallax) * 120;
-    gsap.fromTo(el,
-      { yPercent: -speed / 2 },
-      {
-        yPercent: speed,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: document.body,
-          start: 'top bottom',
-          end: 'bottom top',
-          scrub: 1.1,
-        },
-      }
-    );
-  });
-
-  /* ============================================================
-     7) القائمة العلوية وزر العودة وقائمة الجوال
+     6) حالة الشريط العلوي وزر العودة
      ============================================================ */
   const nav = document.getElementById('nav');
   const toTop = document.getElementById('toTop');
-
   let scrollTicking = false;
   function onScroll() {
     if (scrollTicking) return;
@@ -397,24 +248,8 @@
   window.addEventListener('scroll', onScroll, { passive: true });
   onScroll();
 
-  toTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
-
-  const navToggle = document.getElementById('navToggle');
-  const mobileMenu = document.getElementById('mobileMenu');
-  navToggle.addEventListener('click', () => {
-    const open = document.body.classList.toggle('menu-open');
-    navToggle.setAttribute('aria-label', open ? 'إغلاق القائمة' : 'فتح القائمة');
-    document.body.style.overflow = open ? 'hidden' : '';
-  });
-  mobileMenu.querySelectorAll('a').forEach((a) =>
-    a.addEventListener('click', () => {
-      document.body.classList.remove('menu-open');
-      document.body.style.overflow = '';
-    })
-  );
-
   /* ============================================================
-     8) المؤشر المخصص + المغناطيس + الإمالة
+     7) المؤشر المخصص + المغناطيس + الإمالة
      ============================================================ */
   if (FINE) {
     const cursor = document.getElementById('cursor');
@@ -423,13 +258,10 @@
     gsap.set([dot, ring], { xPercent: -50, yPercent: -50, x: innerWidth / 2, y: innerHeight / 2 });
 
     let mx = innerWidth / 2, my = innerHeight / 2, rx = mx, ry = my;
-
     window.addEventListener('mousemove', (e) => {
-      mx = e.clientX;
-      my = e.clientY;
+      mx = e.clientX; my = e.clientY;
       gsap.set(dot, { x: mx, y: my });
     }, { passive: true });
-
     gsap.ticker.add(() => {
       rx += (mx - rx) * 0.16;
       ry += (my - ry) * 0.16;
@@ -444,9 +276,11 @@
     document.querySelectorAll('.magnetic').forEach((el) => {
       el.addEventListener('mousemove', (e) => {
         const r = el.getBoundingClientRect();
-        const x = e.clientX - r.left - r.width / 2;
-        const y = e.clientY - r.top - r.height / 2;
-        gsap.to(el, { x: x * 0.32, y: y * 0.32, duration: 0.45, ease: 'power3.out' });
+        gsap.to(el, {
+          x: (e.clientX - r.left - r.width / 2) * 0.32,
+          y: (e.clientY - r.top - r.height / 2) * 0.32,
+          duration: 0.45, ease: 'power3.out',
+        });
       });
       el.addEventListener('mouseleave', () =>
         gsap.to(el, { x: 0, y: 0, duration: 0.8, ease: 'elastic.out(1, 0.4)' })
@@ -461,11 +295,8 @@
         card.style.setProperty('--mx', px * 100 + '%');
         card.style.setProperty('--my', py * 100 + '%');
         gsap.to(card, {
-          rotateY: (px - 0.5) * 6,
-          rotateX: (0.5 - py) * 6,
-          duration: 0.5,
-          transformPerspective: 900,
-          ease: 'power2.out',
+          rotateY: (px - 0.5) * 6, rotateX: (0.5 - py) * 6,
+          duration: 0.5, transformPerspective: 900, ease: 'power2.out',
         });
       });
       card.addEventListener('mouseleave', () =>
@@ -475,40 +306,15 @@
   }
 
   /* ============================================================
-     9) نسخ رقم الهاتف
-     ============================================================ */
-  const copyBtn = document.getElementById('copyPhone');
-  const copyLabel = document.getElementById('copyPhoneLabel');
-  copyBtn.addEventListener('click', async () => {
-    const phone = '07715993271';
-    try {
-      await navigator.clipboard.writeText(phone);
-    } catch (err) {
-      const tmp = document.createElement('input');
-      tmp.value = phone;
-      document.body.appendChild(tmp);
-      tmp.select();
-      document.execCommand('copy');
-      tmp.remove();
-    }
-    const original = copyLabel.textContent;
-    copyLabel.textContent = 'تم النسخ ✓';
-    setTimeout(() => { copyLabel.textContent = original; }, 2200);
-  });
-
-  /* ============================================================
-     10) غبار بابل — sprites مرسومة مسبقاً + إيقاف خارج الشاشة
+     8) غبار بابل — sprites + إيقاف خارج الشاشة
      ============================================================ */
   function initDust() {
     const canvas = document.getElementById('dust');
     const hero = document.getElementById('hero');
     if (!canvas || !hero) return;
     const ctx = canvas.getContext('2d');
-    let w = 0, h = 0, raf = 0;
-    let particles = [];
-    let visible = true;
+    let w = 0, h = 0, raf = 0, particles = [], visible = true;
 
-    /* نرسم شكل الغبارة مرة واحدة بدل createRadialGradient كل إطار */
     function makeSprite(rgb) {
       const s = document.createElement('canvas');
       const size = 32;
@@ -527,14 +333,11 @@
 
     function resize() {
       const dpr = Math.min(window.devicePixelRatio || 1, 1.6);
-      w = canvas.clientWidth;
-      h = canvas.clientHeight;
-      canvas.width = w * dpr;
-      canvas.height = h * dpr;
+      w = canvas.clientWidth; h = canvas.clientHeight;
+      canvas.width = w * dpr; canvas.height = h * dpr;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       seed();
     }
-
     function seed() {
       const count = Math.min(46, Math.floor((w * h) / 26000));
       particles = Array.from({ length: count }, () => ({
@@ -548,7 +351,6 @@
         alpha: Math.random() * 0.45 + 0.2,
       }));
     }
-
     function frame() {
       ctx.clearRect(0, 0, w, h);
       for (const p of particles) {
@@ -556,7 +358,6 @@
         p.sway += p.swaySp;
         p.x += Math.sin(p.sway) * 0.22;
         if (p.y < -12) { p.y = h + 12; p.x = Math.random() * w; }
-
         ctx.globalAlpha = p.alpha;
         const size = p.r * 7;
         ctx.drawImage(p.gold ? goldSprite : blueSprite, p.x - size / 2, p.y - size / 2, size, size);
@@ -564,105 +365,27 @@
       ctx.globalAlpha = 1;
       raf = requestAnimationFrame(frame);
     }
+    function start() { if (!raf && visible) raf = requestAnimationFrame(frame); }
+    function stop() { cancelAnimationFrame(raf); raf = 0; }
 
-    function start() {
-      if (raf || !visible) return;
-      raf = requestAnimationFrame(frame);
-    }
-    function stop() {
-      cancelAnimationFrame(raf);
-      raf = 0;
-    }
-
-    /* إيقاف الرسم كلياً عندما يغادر الهيرو الشاشة */
     if ('IntersectionObserver' in window) {
       new IntersectionObserver((entries) => {
         visible = entries[0].isIntersecting;
         visible ? start() : stop();
       }, { threshold: 0 }).observe(hero);
     }
-
     resize();
     window.addEventListener('resize', resize);
     start();
-
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden) stop();
-      else start();
-    });
+    document.addEventListener('visibilitychange', () => { document.hidden ? stop() : start(); });
   }
   initDust();
 
-  /* تحديث مواقع التمرير بعد تحميل الخطوط والصور */
-  if (document.fonts && document.fonts.ready) {
-    document.fonts.ready.then(() => ScrollTrigger.refresh());
-  }
-  window.addEventListener('load', () => ScrollTrigger.refresh());
-  document.querySelectorAll('img').forEach((img) =>
-    img.addEventListener('load', () => ScrollTrigger.refresh(), { once: true })
-  );
-
-  /* إعادة حساب عند تغيير حجم الشاشة (شريط عنوان كروم المتغير على الموبايل) */
-  let resizeTimer = 0;
-  window.addEventListener('resize', () => {
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(() => ScrollTrigger.refresh(), 250);
-  });
-
-  /* ============================================================
-     11) شبكة أمان: لا شيء يبقى مخفياً داخل الشاشة لأي سبب كان
-     ============================================================ */
-  function rescueHidden() {
-    const vh = window.innerHeight;
-    const inView = (el) => {
-      const r = el.getBoundingClientRect();
-      return r.top < vh * 0.95 && r.bottom > 0;
-    };
-
-    document.querySelectorAll('[data-reveal]').forEach((el) => {
-      if (el.dataset.rescued || !inView(el)) return;
-      el.dataset.rescued = '1';
-      gsap.to(el, { y: 0, opacity: 1, duration: 0.7, ease: 'power2.out' });
-    });
-
-    document.querySelectorAll('.section__title').forEach((t) => {
-      if (t.dataset.rescued || !inView(t)) return;
-      t.dataset.rescued = '1';
-      gsap.to(t.querySelectorAll('.word__inner'), {
-        yPercent: 0, duration: 0.7, stagger: 0.05, ease: 'power2.out',
-      });
-    });
-
-    document.querySelectorAll('[data-img-reveal]').forEach((w) => {
-      if (w.dataset.rescued || !inView(w)) return;
-      w.dataset.rescued = '1';
-      gsap.to(w, {
-        clipPath: 'inset(0% 0% 0% 0%)', opacity: 1,
-        duration: 0.9, ease: 'power2.out',
-      });
-    });
-  }
-  let rescueTicking = false;
-  function onRescueScroll() {
-    if (rescueTicking) return;
-    rescueTicking = true;
-    requestAnimationFrame(() => { rescueHidden(); rescueTicking = false; });
-  }
-  window.addEventListener('scroll', onRescueScroll, { passive: true });
-  window.addEventListener('resize', rescueHidden);
-  setTimeout(rescueHidden, 3500);
-  window.addEventListener('load', rescueHidden);
-
-  /* إزالة قسرية للبوابة الافتتاحية تحت أي ظرف (لا تعلق الموقع أبداً) */
+  /* إزالة قسرية للبوابة تحت أي ظرف */
   setTimeout(() => {
     if (gateIntro && document.body.contains(gateIntro)) {
       document.body.style.overflow = '';
       gateIntro.remove();
     }
   }, 9000);
-
-  /* شبكة أمان: أي فشل غير متوقع لا يخفي المحتوى */
-  setTimeout(() => {
-    if (!window.__animReady && gateIntro) gateIntro.remove();
-  }, 5000);
 })();

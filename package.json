@@ -2,7 +2,6 @@
   "name": "farhood-cv",
   "version": "1.0.0",
   "description": "صفحة تعريفية احترافية للمهندس حسين عباس فرهود",
-  "main": "index.js",
   "scripts": {
     "start": "python3 -m http.server 8000"
   },
