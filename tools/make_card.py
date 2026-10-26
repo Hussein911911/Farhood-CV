@@ -13,7 +13,7 @@ from PIL import Image, ImageDraw, ImageFont, ImageFilter
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BUILD = os.path.join(ROOT, "tools", ".build")
 ASSETS = os.path.join(ROOT, "assets")
-URL = "https://farhood-cv.onrender.com/#contact"
+URL = "https://farhood-cv.onrender.com/"
 
 # ---------------- الألوان ----------------
 NAVY_TOP = (26, 70, 122)
