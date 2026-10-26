@@ -65,6 +65,43 @@
     });
   })();
 
+  /* ---------- حماية المحتوى ---------- */
+  function initProtection() {
+    // منع القائمة المنبثقة والسحب للصور والروابط
+    document.addEventListener('contextmenu', (e) => e.preventDefault());
+    document.addEventListener('dragstart', (e) => {
+      if (e.target.closest('img, a')) e.preventDefault();
+    });
+
+    // منع اختصارات الحفظ/الطباعة/أدوات المطوّر ومحاولة تفريغ لقطة الشاشة
+    const clearClipboard = () => {
+      try { navigator.clipboard && navigator.clipboard.writeText(''); } catch (err) { /* تجاهل */ }
+    };
+    document.addEventListener('keydown', (e) => {
+      const key = e.key.toLowerCase();
+      if (e.key === 'PrintScreen') { e.preventDefault(); clearClipboard(); return; }
+      const mod = e.ctrlKey || e.metaKey;
+      if (mod && ['p', 's', 'u'].includes(key)) e.preventDefault();
+      if (mod && e.shiftKey && ['i', 'j', 'c'].includes(key)) e.preventDefault();
+      if (mod && e.altKey && ['i', 'j', 'c'].includes(key)) e.preventDefault();
+      if (key === 'f12') e.preventDefault();
+    });
+    document.addEventListener('keyup', (e) => {
+      if (e.key === 'PrintScreen') clearClipboard();
+    });
+
+    // إخفاء المحتوى عند مغادرة النافذة (معاينة التطبيقات، تبديل المهام، تسجيل الشاشة)
+    const root = document.documentElement;
+    const hide = () => root.classList.add('is-captured');
+    const show = () => root.classList.remove('is-captured');
+    window.addEventListener('blur', hide);
+    window.addEventListener('focus', show);
+    document.addEventListener('visibilitychange', () => {
+      document.hidden ? hide() : show();
+    });
+  }
+  initProtection();
+
   /* ---------- تفاعلات أساسية ---------- */
   function initBasicInteractions() {
     const toTopBtn = document.getElementById('toTop');
