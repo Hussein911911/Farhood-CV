@@ -67,11 +67,29 @@
 
   /* ---------- حماية المحتوى ---------- */
   function initProtection() {
-    // منع القائمة المنبثقة والسحب للصور والروابط
+    const root = document.documentElement;
+    let veilTimer = 0;
+
+    // ستار الحماية — مع ضمان إزالته التلقائي حتى لا تعلق الشاشة الزرقاء أبداً
+    function showVeil() {
+      clearTimeout(veilTimer);
+      root.classList.add('is-captured');
+      // لقطة معاينة التطبيقات تُلتقط فور الإخفاء، وبعدها نرفع الستار تلقائياً
+      veilTimer = setTimeout(hideVeil, 1400);
+    }
+    function hideVeil() {
+      clearTimeout(veilTimer);
+      root.classList.remove('is-captured');
+    }
+
+    // منع القائمة المنبثقة والسحب والتحديد والنسخ
     document.addEventListener('contextmenu', (e) => e.preventDefault());
     document.addEventListener('dragstart', (e) => {
       if (e.target.closest('img, a')) e.preventDefault();
     });
+    document.addEventListener('selectstart', (e) => e.preventDefault());
+    document.addEventListener('copy', (e) => { e.preventDefault(); });
+    document.addEventListener('cut', (e) => { e.preventDefault(); });
 
     // منع اختصارات الحفظ/الطباعة/أدوات المطوّر ومحاولة تفريغ لقطة الشاشة
     const clearClipboard = () => {
@@ -81,24 +99,27 @@
       const key = e.key.toLowerCase();
       if (e.key === 'PrintScreen') { e.preventDefault(); clearClipboard(); return; }
       const mod = e.ctrlKey || e.metaKey;
-      if (mod && ['p', 's', 'u'].includes(key)) e.preventDefault();
-      if (mod && e.shiftKey && ['i', 'j', 'c'].includes(key)) e.preventDefault();
-      if (mod && e.altKey && ['i', 'j', 'c'].includes(key)) e.preventDefault();
-      if (key === 'f12') e.preventDefault();
+      if (!mod) {
+        if (key === 'f12') e.preventDefault();
+        return;
+      }
+      if (['p', 's', 'u'].includes(key)) e.preventDefault();
+      if (e.shiftKey && ['i', 'j', 'c', 's'].includes(key)) e.preventDefault();
+      if (e.altKey && ['i', 'j', 'c'].includes(key)) e.preventDefault();
     });
     document.addEventListener('keyup', (e) => {
       if (e.key === 'PrintScreen') clearClipboard();
     });
 
-    // إخفاء المحتوى عند مغادرة النافذة (معاينة التطبيقات، تبديل المهام، تسجيل الشاشة)
-    const root = document.documentElement;
-    const hide = () => root.classList.add('is-captured');
-    const show = () => root.classList.remove('is-captured');
-    window.addEventListener('blur', hide);
-    window.addEventListener('focus', show);
+    // إخفاء المحتوى عند مغادرة التبويب فقط — بلا الاعتماد على blur المضطرب بالموبايل
     document.addEventListener('visibilitychange', () => {
-      document.hidden ? hide() : show();
+      if (document.hidden) showVeil(); else hideVeil();
     });
+    window.addEventListener('pagehide', showVeil);
+    window.addEventListener('pageshow', hideVeil);
+    window.addEventListener('focus', hideVeil);
+    // ضمانة أخيرة: أي لمسة أو تمرير يرفع الستار فوراً
+    window.addEventListener('pointerdown', hideVeil, { once: false });
   }
   initProtection();
 
